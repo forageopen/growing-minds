@@ -136,7 +136,7 @@ export default function App() {
           <Baby size={26} strokeWidth={2} />
           <div>
             <h1>Baby Boom</h1>
-            <p>An educational look at child development, not a diagnostic tool</p>
+            <p>An educational look at child development</p>
           </div>
         </div>
         <div className="app-header-actions">
@@ -190,7 +190,7 @@ export default function App() {
 
           <ChartCard
             title={profileHasSelection ? "Where this profile sits" : "Where the population sits"}
-            subtitle="A transparent index built from group averages for the factors you selected — not a prediction"
+            subtitle="A transparent index built from group averages for the factors you selected"
             explainer={
               <>
                 <p>
@@ -430,7 +430,7 @@ export default function App() {
         />
 
         {regression && idealCeiling && (
-          <ChartCard title="A case study in this project's own data" subtitle="Computed live from the current engine, not a fixed writeup">
+          <ChartCard title="A case study in this project's own data" subtitle="Computed live from the current engine">
             <VariableSelectionCaseStudy
               naiveR2={naiveR2}
               correctedR2={regression.modelR2}
