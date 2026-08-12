@@ -36,3 +36,27 @@ export const CATEGORY_ORDERS: Record<string, string[]> = {
 export function prettyKey(key: string): string {
   return key.replace(/_/g, " ").replace(/^\w/, (c) => c.toUpperCase());
 }
+
+// Which numeric predictors (from correlations.json) describe something a
+// caregiver could still influence for a child today, versus something that
+// is already fixed by the time anyone could read this page. Used only for
+// the "What can change?" framing — not a claim that every "fixed" factor is
+// immutable in general, only that it's already settled for a given child.
+export const MODIFIABLE_COLUMNS = new Set([
+  "home_stimulation_score",
+  "books_in_home",
+  "screen_hours_daily",
+  "nutrition_quality",
+  "adverse_childhood_experiences",
+]);
+
+export const FIXED_COLUMNS = new Set([
+  "mother_iq",
+  "father_iq",
+  "parental_ses",
+  "maternal_education_years",
+  "maternal_age_at_birth",
+  "gestational_age_weeks",
+  "birth_weight_g",
+  "breastfed_months",
+]);

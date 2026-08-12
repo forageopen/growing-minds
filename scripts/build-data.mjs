@@ -238,6 +238,20 @@ const correlationMatrix = {
   ),
 };
 
+// Per-variable mean/SD for every continuous field the profile builder lets a
+// visitor set — lets the client turn "your value" into a z-score * r delta
+// against child_iq without ever touching the raw rows.
+const PROFILE_NUMERIC_VARS = [
+  "maternal_education_years", "maternal_age_at_birth", "home_stimulation_score",
+  "books_in_home", "screen_hours_daily", "nutrition_quality",
+  "adverse_childhood_experiences", "breastfed_months",
+];
+const variableStats = {};
+for (const col of PROFILE_NUMERIC_VARS) {
+  const vals = rows.map((r) => r[col]);
+  variableStats[col] = { mean: +mean(vals).toFixed(3), sd: +stddev(vals).toFixed(3) };
+}
+
 writeFileSync(path.join(PUBLIC_DATA_DIR, "overview.json"), JSON.stringify(overview));
 writeFileSync(path.join(PUBLIC_DATA_DIR, "distributions.json"), JSON.stringify(distributions));
 writeFileSync(path.join(PUBLIC_DATA_DIR, "flynn_effect.json"), JSON.stringify(flynnEffect));
@@ -247,6 +261,7 @@ writeFileSync(path.join(PUBLIC_DATA_DIR, "correlations.json"), JSON.stringify(co
 writeFileSync(path.join(PUBLIC_DATA_DIR, "correlation_matrix.json"), JSON.stringify(correlationMatrix));
 writeFileSync(path.join(PUBLIC_DATA_DIR, "scatter_sample.json"), JSON.stringify(scatterSample));
 writeFileSync(path.join(PUBLIC_DATA_DIR, "dictionary.json"), JSON.stringify(dictionary));
+writeFileSync(path.join(PUBLIC_DATA_DIR, "variable_stats.json"), JSON.stringify(variableStats));
 writeFileSync(path.join(PUBLIC_DATA_DIR, "validation.json"), JSON.stringify(validation));
 
 console.log("Wrote processed data to", PROCESSED_DIR);

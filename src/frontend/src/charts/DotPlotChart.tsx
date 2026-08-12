@@ -8,13 +8,14 @@ interface Props {
   populationMean: number;
   order?: string[];
   labelFor?: (key: string) => string;
+  markerKey?: string;
 }
 
 const W = 640;
 const ROW_H = 34;
 const M = { top: 8, right: 24, bottom: 24, left: 140 };
 
-export function DotPlotChart({ data, populationMean, order, labelFor }: Props) {
+export function DotPlotChart({ data, populationMean, order, labelFor, markerKey }: Props) {
   const [hover, setHover] = useState<string | null>(null);
 
   const keyed = data.map((d) => ({ ...d, key: String(d.key) }));
@@ -47,10 +48,11 @@ export function DotPlotChart({ data, populationMean, order, labelFor }: Props) {
         {sorted.map((d, i) => {
           const cy = M.top + 14 + i * ROW_H;
           const isHover = hover === d.key;
+          const isYou = markerKey === d.key;
           const above = d.mean >= populationMean;
           return (
             <g key={d.key} onMouseEnter={() => setHover(d.key)} onMouseLeave={() => setHover(null)} style={{ cursor: "pointer" }}>
-              <text x={M.left - 12} y={cy} textAnchor="end" dominantBaseline="middle" className="lollipop-label">
+              <text x={M.left - 12} y={cy} textAnchor="end" dominantBaseline="middle" className={isYou ? "lollipop-label you-row-label" : "lollipop-label"}>
                 {labelFor ? labelFor(d.key) : d.key}
               </text>
               <line
@@ -61,16 +63,24 @@ export function DotPlotChart({ data, populationMean, order, labelFor }: Props) {
                 className="dotplot-stem flow-dash"
                 style={{ animationDelay: `${i * 0.1}s`, animationDirection: above ? "normal" : "reverse" }}
               />
+              {isYou && (
+                <circle cx={x(d.mean)} cy={cy} r={12} fill="none" stroke="var(--marker-you)" strokeWidth={2} className="pulse-dot" opacity={0.7} />
+              )}
               <circle
                 cx={x(d.mean)}
                 cy={cy}
                 r={isHover ? 7 : 5.5}
-                fill={above ? "var(--diverging-pos)" : "var(--diverging-neg)"}
+                fill={isYou ? "var(--marker-you)" : above ? "var(--diverging-pos)" : "var(--diverging-neg)"}
                 stroke="var(--chart-surface)"
                 strokeWidth={1.5}
-                className="pulse-dot"
+                className={isYou ? undefined : "pulse-dot"}
                 style={{ animationDelay: `${i * 0.15}s` }}
               />
+              {isYou && (
+                <text x={x(d.mean)} y={cy - 16} textAnchor="middle" className="you-marker-label">
+                  You
+                </text>
+              )}
             </g>
           );
         })}

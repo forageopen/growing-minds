@@ -1,116 +1,136 @@
 /*
-  Design tokens sourced from Atlassian Design System (@atlaskit/tokens palette,
-  brand-refresh ramp). The 8-hue categorical order below was run through the
-  dataviz skill's validate_palette.js:
-    light — all hard gates PASS (worst adjacent CVD dE 8.0, normal-vision dE 24.3)
-    dark  — all hard gates PASS (worst adjacent CVD dE 6.8 — 6-8 floor band,
-            mitigated with direct labels / legend, never color-alone)
+  Design tokens: Deep Plum / Warm Bone / Muted Sage — an academic, biological,
+  humane palette (user-directed), not the earlier Atlassian blue system.
+
+  The 8-hue categorical order was derived from this family (Burgundy, Sage,
+  Mauve, Ochre, Teal, Olive, Slate Blue, Terracotta) and run through the
+  dataviz skill's validate_palette.js. By design this palette sits below the
+  skill's chroma-floor / lightness-band gates — muted chroma is the point,
+  not an oversight — but the two gates that protect actual legibility both
+  clear on the final order:
+    dark  (surface #29202B): CVD dE 10.4, normal-vision dE 17.9 — PASS
+    light (surface #F1EBDD): CVD dE 8.5,  normal-vision dE 17.2 — PASS
+  Rose Clay is reserved exclusively as the "you" marker / selected-state
+  color and deliberately excluded from the 8-way categorical rotation.
 */
 :root {
   color-scheme: light;
 
+  /* type */
+  --font-serif: "Source Serif 4", ui-serif, Georgia, "Times New Roman", serif;
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+
   /* surfaces */
-  --abd-page: #f8f8f8;
-  --abd-surface: #ffffff;
-  --abd-surface-raised: #ffffff;
-  --abd-border: #dddee1;
-  --abd-border-hairline: rgba(23, 43, 77, 0.12);
+  --abd-page: #f7f2e7;
+  --abd-surface: #f1ebdd;
+  --abd-surface-raised: #fbf8f1;
+  --abd-border: #dcd1d6;
+  --abd-border-hairline: rgba(41, 32, 43, 0.12);
 
   /* ink */
-  --abd-text-primary: #1e1f21;
-  --abd-text-secondary: #6b6e76;
-  --abd-text-muted: #8c8f97;
-  --abd-link: #357de8;
+  --abd-text-primary: #29202b;
+  --abd-text-secondary: #5c4f5e;
+  --abd-text-muted: #8a7c8c;
+  --abd-link: #8f6a2c;
 
   /* chart chrome */
-  --chart-surface: #ffffff;
-  --chart-grid: #dddee1;
-  --chart-axis: #b7b9be;
-  --chart-tooltip-bg: #1e1f21;
-  --chart-tooltip-text: #ffffff;
+  --chart-surface: #f1ebdd;
+  --chart-grid: #e4dacb;
+  --chart-axis: #c9bdb0;
+  --chart-tooltip-bg: #29202b;
+  --chart-tooltip-text: #f1ebdd;
 
-  /* brand accent */
-  --abd-brand-bold: #0c66e4;
-  --abd-brand-subtle: #e9f2fe;
+  /* brand accent (Soft Ochre family — "interaction / overlap") */
+  --abd-brand-bold: #8f6a2c;
+  --abd-brand-subtle: #f3e7ce;
 
   /* status */
-  --status-good: #22a06b;
-  --status-warning: #e2b203;
-  --status-serious: #e56910;
-  --status-critical: #e2483d;
+  --status-good: #3f7a45;
+  --status-warning: #a9791a;
+  --status-serious: #9c5a2e;
+  --status-critical: #a03347;
 
-  /* categorical series (validated order — never reorder, never cycle) */
-  --series-1: #4688ec; /* blue */
-  --series-2: #f68909; /* orange */
-  --series-3: #42b2d7; /* teal */
-  --series-4: #cf9f02; /* yellow */
-  --series-5: #da62ac; /* magenta */
-  --series-6: #2abb7f; /* green */
-  --series-7: #bf63f3; /* purple */
-  --series-8: #f15b50; /* red */
+  /* categorical series — fixed order, never cycled, never reordered */
+  --series-1: #80303e; /* burgundy — genetics / parental */
+  --series-2: #4f7350; /* sage — environment */
+  --series-3: #6f4372; /* mauve */
+  --series-4: #b07d1f; /* ochre — interaction / overlap */
+  --series-5: #235f6e; /* teal */
+  --series-6: #8f7025; /* olive */
+  --series-7: #3f597d; /* slate blue */
+  --series-8: #853416; /* terracotta */
 
-  /* diverging (correlation sign) */
-  --diverging-pos: #4688ec;
-  --diverging-neg: #f15b50;
-  --diverging-mid: #f0f1f2;
+  /* diverging (correlation sign): sage = positive, burgundy-red = negative */
+  --diverging-pos: #3f7a45;
+  --diverging-neg: #a03347;
+  --diverging-mid: #e4dacb;
 
-  /* sequential (blue, light -> dark) */
-  --seq-100: #e9f2fe;
-  --seq-300: #8fb8f6;
-  --seq-500: #4688ec;
-  --seq-700: #1868db;
+  /* sequential (ochre, light -> dark) */
+  --seq-100: #f3e7ce;
+  --seq-300: #d9b568;
+  --seq-500: #b07d1f;
+  --seq-700: #7a5416;
+
+  /* reserved: "you" marker / highlight / selected state — Rose Clay */
+  --marker-you: #9d3e47;
+  --marker-you-ring: rgba(157, 62, 71, 0.16);
+  --marker-you-text: #f1ebdd;
 
   --radius-card: 8px;
   --radius-tile: 6px;
-  --shadow-card: 0 1px 1px rgba(23, 43, 77, 0.15), 0 0 1px rgba(23, 43, 77, 0.25);
+  --shadow-card: 0 1px 1px rgba(41, 32, 43, 0.14), 0 0 1px rgba(41, 32, 43, 0.22);
 }
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     color-scheme: dark;
 
-    --abd-page: #14151a;
-    --abd-surface: #1d2125;
-    --abd-surface-raised: #242528;
-    --abd-border: #303134;
-    --abd-border-hairline: rgba(226, 227, 228, 0.14);
+    --abd-page: #211a23;
+    --abd-surface: #29202b;
+    --abd-surface-raised: #3a303d;
+    --abd-border: #514652;
+    --abd-border-hairline: rgba(241, 235, 221, 0.12);
 
-    --abd-text-primary: #e2e3e4;
-    --abd-text-secondary: #bfc1c4;
-    --abd-text-muted: #7e8188;
-    --abd-link: #669df1;
+    --abd-text-primary: #f1ebdd;
+    --abd-text-secondary: #bdb1bf;
+    --abd-text-muted: #8c8092;
+    --abd-link: #ddad54;
 
-    --chart-surface: #1d2125;
-    --chart-grid: #303134;
-    --chart-axis: #4b4d51;
-    --chart-tooltip-bg: #e2e3e4;
-    --chart-tooltip-text: #1d2125;
+    --chart-surface: #29202b;
+    --chart-grid: #514652;
+    --chart-axis: #6b5f6c;
+    --chart-tooltip-bg: #f1ebdd;
+    --chart-tooltip-text: #29202b;
 
-    --abd-brand-bold: #669df1;
-    --abd-brand-subtle: #123263;
+    --abd-brand-bold: #ddad54;
+    --abd-brand-subtle: #3d3527;
 
-    --status-good: #4bce97;
-    --status-warning: #e2b203;
-    --status-serious: #e56910;
-    --status-critical: #f87168;
+    --status-good: #6fae73;
+    --status-warning: #d9a94d;
+    --status-serious: #c97b4a;
+    --status-critical: #c1495a;
 
-    --series-1: #357de8;
-    --series-2: #e06c00;
-    --series-3: #2898bd;
-    --series-4: #b38600;
-    --series-5: #cd519d;
-    --series-6: #22a06b;
-    --series-7: #af59e1;
-    --series-8: #e2483d;
+    --series-1: #b84b5e;
+    --series-2: #7ba27c;
+    --series-3: #9f66a3;
+    --series-4: #ddad54;
+    --series-5: #42918b;
+    --series-6: #ba9f42;
+    --series-7: #6584af;
+    --series-8: #c04e24;
 
-    --diverging-pos: #357de8;
-    --diverging-neg: #e2483d;
-    --diverging-mid: #303134;
+    --diverging-pos: #6fae73;
+    --diverging-neg: #c1495a;
+    --diverging-mid: #4a3f4c;
 
-    --seq-100: #123263;
-    --seq-300: #1868db;
-    --seq-500: #357de8;
-    --seq-700: #8fb8f6;
+    --seq-100: #3d3527;
+    --seq-300: #8f7025;
+    --seq-500: #ddad54;
+    --seq-700: #f0d089;
+
+    --marker-you: #c98289;
+    --marker-you-ring: rgba(201, 130, 137, 0.28);
+    --marker-you-text: #29202b;
 
     --shadow-card: 0 1px 1px rgba(0, 0, 0, 0.35), 0 0 1px rgba(0, 0, 0, 0.5);
   }
@@ -119,48 +139,52 @@
 :root[data-theme="dark"] {
   color-scheme: dark;
 
-  --abd-page: #14151a;
-  --abd-surface: #1d2125;
-  --abd-surface-raised: #242528;
-  --abd-border: #303134;
-  --abd-border-hairline: rgba(226, 227, 228, 0.14);
+  --abd-page: #211a23;
+  --abd-surface: #29202b;
+  --abd-surface-raised: #3a303d;
+  --abd-border: #514652;
+  --abd-border-hairline: rgba(241, 235, 221, 0.12);
 
-  --abd-text-primary: #e2e3e4;
-  --abd-text-secondary: #bfc1c4;
-  --abd-text-muted: #7e8188;
-  --abd-link: #669df1;
+  --abd-text-primary: #f1ebdd;
+  --abd-text-secondary: #bdb1bf;
+  --abd-text-muted: #8c8092;
+  --abd-link: #ddad54;
 
-  --chart-surface: #1d2125;
-  --chart-grid: #303134;
-  --chart-axis: #4b4d51;
-  --chart-tooltip-bg: #e2e3e4;
-  --chart-tooltip-text: #1d2125;
+  --chart-surface: #29202b;
+  --chart-grid: #514652;
+  --chart-axis: #6b5f6c;
+  --chart-tooltip-bg: #f1ebdd;
+  --chart-tooltip-text: #29202b;
 
-  --abd-brand-bold: #669df1;
-  --abd-brand-subtle: #123263;
+  --abd-brand-bold: #ddad54;
+  --abd-brand-subtle: #3d3527;
 
-  --status-good: #4bce97;
-  --status-warning: #e2b203;
-  --status-serious: #e56910;
-  --status-critical: #f87168;
+  --status-good: #6fae73;
+  --status-warning: #d9a94d;
+  --status-serious: #c97b4a;
+  --status-critical: #c1495a;
 
-  --series-1: #357de8;
-  --series-2: #e06c00;
-  --series-3: #2898bd;
-  --series-4: #b38600;
-  --series-5: #cd519d;
-  --series-6: #22a06b;
-  --series-7: #af59e1;
-  --series-8: #e2483d;
+  --series-1: #b84b5e;
+  --series-2: #7ba27c;
+  --series-3: #9f66a3;
+  --series-4: #ddad54;
+  --series-5: #42918b;
+  --series-6: #ba9f42;
+  --series-7: #6584af;
+  --series-8: #c04e24;
 
-  --diverging-pos: #357de8;
-  --diverging-neg: #e2483d;
-  --diverging-mid: #303134;
+  --diverging-pos: #6fae73;
+  --diverging-neg: #c1495a;
+  --diverging-mid: #4a3f4c;
 
-  --seq-100: #123263;
-  --seq-300: #1868db;
-  --seq-500: #357de8;
-  --seq-700: #8fb8f6;
+  --seq-100: #3d3527;
+  --seq-300: #8f7025;
+  --seq-500: #ddad54;
+  --seq-700: #f0d089;
+
+  --marker-you: #c98289;
+  --marker-you-ring: rgba(201, 130, 137, 0.28);
+  --marker-you-text: #29202b;
 
   --shadow-card: 0 1px 1px rgba(0, 0, 0, 0.35), 0 0 1px rgba(0, 0, 0, 0.5);
 }

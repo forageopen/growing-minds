@@ -9,13 +9,15 @@ interface Props {
   bins: HistBin[];
   color?: string;
   unit?: string;
+  markerValue?: number;
+  markerLabel?: string;
 }
 
 const W = 640;
 const H = 220;
-const M = { top: 12, right: 16, bottom: 28, left: 16 };
+const M = { top: 30, right: 16, bottom: 28, left: 16 };
 
-export function DensityChart({ bins, color = "var(--series-1)", unit = "" }: Props) {
+export function DensityChart({ bins, color = "var(--series-1)", unit = "", markerValue, markerLabel }: Props) {
   const [hoverX, setHoverX] = useState<number | null>(null);
   const reducedMotion = useReducedMotion();
   const pathId = `density-comet-${useId().replace(/[^a-zA-Z0-9]/g, "")}`;
@@ -69,6 +71,16 @@ export function DensityChart({ bins, color = "var(--series-1)", unit = "" }: Pro
 
         {nearest && (
           <line x1={x(nearest.x)} x2={x(nearest.x)} y1={M.top} y2={H - M.bottom} className="crosshair" />
+        )}
+
+        {markerValue !== undefined && (
+          <g className="you-marker">
+            <line x1={x(markerValue)} x2={x(markerValue)} y1={M.top - 14} y2={H - M.bottom} stroke="var(--marker-you)" strokeWidth={2.5} />
+            <circle cx={x(markerValue)} cy={M.top - 14} r={5.5} fill="var(--marker-you)" className="pulse-dot" />
+            <text x={x(markerValue)} y={M.top - 22} textAnchor="middle" className="you-marker-label">
+              {markerLabel ?? "You"}
+            </text>
+          </g>
         )}
 
         <rect

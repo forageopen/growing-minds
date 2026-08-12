@@ -1,7 +1,14 @@
-import { useState } from "react";
-import { Baby, Brain, Github, ShieldCheck, TrendingUp, Users } from "lucide-react";
+import { useMemo, useState } from "react";
+import { Baby, Github, Users, Brain, TrendingUp, ShieldCheck } from "lucide-react";
 import { useJson } from "./lib/useJson";
 import { COLUMN_LABELS, CATEGORY_ORDERS, prettyKey } from "./lib/labels";
+import {
+  computeScore,
+  emptyProfile,
+  percentileFromDistribution,
+  type Profile,
+  type VariableStats,
+} from "./lib/profile";
 import type {
   ByBinary,
   ByCategory,
@@ -18,6 +25,11 @@ import { StatTile } from "./components/StatTile";
 import { ChartCard } from "./components/ChartCard";
 import { ThemeToggle } from "./components/ThemeToggle";
 import { DictionaryTable } from "./components/DictionaryTable";
+import { SectionHeader } from "./components/SectionHeader";
+import { DisclaimerCallout } from "./components/DisclaimerCallout";
+import { ProfileBuilder } from "./components/ProfileBuilder";
+import { PositionSummary } from "./components/PositionSummary";
+import { FactorSplit } from "./components/FactorSplit";
 
 import { CausalFlowChart } from "./charts/CausalFlowChart";
 import { FlynnEffectChart } from "./charts/FlynnEffectChart";
@@ -30,8 +42,8 @@ import { ScatterWithMargins } from "./charts/ScatterWithMargins";
 
 import "./styles/app.css";
 
-const DENSITY_VARS = ["child_iq", "mother_iq", "father_iq", "parental_ses", "home_stimulation_score", "screen_hours_daily"] as const;
 const CATEGORY_VARS = ["household_income_bracket", "early_education", "iodine_status", "lead_exposure", "prenatal_care"] as const;
+const PROFILE_CATEGORY_VARS = new Set(["household_income_bracket", "early_education", "prenatal_care"]);
 const SCATTER_VARS = ["mother_iq", "father_iq", "parental_ses", "home_stimulation_score"] as const;
 
 const BINARY_FACTORS: { key: keyof ByBinary; label: string }[] = [
@@ -41,6 +53,14 @@ const BINARY_FACTORS: { key: keyof ByBinary; label: string }[] = [
   { key: "preterm", label: "Preterm birth" },
   { key: "low_birth_weight", label: "Low birth weight" },
 ];
+
+function hasSelection(p: Profile): boolean {
+  return (
+    Object.keys(p.categorical).length > 0 ||
+    Object.keys(p.binary).length > 0 ||
+    Object.keys(p.numeric).length > 0
+  );
+}
 
 export default function App() {
   const overview = useJson<Overview>("overview.json");
@@ -53,26 +73,23 @@ export default function App() {
   const scatterSample = useJson<ScatterPoint[]>("scatter_sample.json");
   const dictionary = useJson<DictionaryEntry[]>("dictionary.json");
   const validation = useJson<ValidationReport>("validation.json");
+  const variableStats = useJson<VariableStats>("variable_stats.json");
 
-  const [densityVar, setDensityVar] = useState<(typeof DENSITY_VARS)[number]>("child_iq");
+  const [profile, setProfile] = useState<Profile>(emptyProfile());
   const [categoryVar, setCategoryVar] = useState<(typeof CATEGORY_VARS)[number]>("household_income_bracket");
   const [scatterVar, setScatterVar] = useState<(typeof SCATTER_VARS)[number]>("mother_iq");
 
-  const corrFor = (col: string) => correlations?.find((c) => c.column === col)?.r;
-  const pretermStats = byBinary?.preterm;
-  const pretermGap =
-    pretermStats && pretermStats.find((s) => s.key === true) && pretermStats.find((s) => s.key === false)
-      ? pretermStats.find((s) => s.key === true)!.mean - pretermStats.find((s) => s.key === false)!.mean
-      : undefined;
+  const profileHasSelection = hasSelection(profile);
 
-  const flowSubtitles = {
-    A: corrFor("parental_ses") !== undefined ? `SES r=${corrFor("parental_ses")!.toFixed(2)}` : "…",
-    B: "Iodine · smoking · care",
-    D: corrFor("home_stimulation_score") !== undefined ? `Stimulation r=${corrFor("home_stimulation_score")!.toFixed(2)}` : "…",
-    C: pretermGap !== undefined ? `Preterm ${pretermGap.toFixed(1)} IQ pts` : "…",
-    E: overview ? `mean ${overview.iq.mean.toFixed(0)}` : "…",
-    F: overview ? `${(overview.highPotentialRate * 100).toFixed(1)}% top-decile` : "…",
-  } as const;
+  const scoreResult = useMemo(() => {
+    if (!overview || !byCategory || !byBinary || !correlations || !variableStats) return null;
+    return computeScore(profile, { overview, byCategory, byBinary, correlations, variableStats });
+  }, [profile, overview, byCategory, byBinary, correlations, variableStats]);
+
+  const percentile = useMemo(() => {
+    if (!scoreResult || !distributions) return 50;
+    return percentileFromDistribution(scoreResult.score, distributions.child_iq);
+  }, [scoreResult, distributions]);
 
   const dumbbellRows: DumbbellRow[] = byBinary
     ? BINARY_FACTORS.map(({ key, label }) => {
@@ -85,6 +102,9 @@ export default function App() {
       })
     : [];
 
+  const markerKey =
+    PROFILE_CATEGORY_VARS.has(categoryVar) ? profile.categorical[categoryVar as "household_income_bracket" | "early_education" | "prenatal_care"] : undefined;
+
   return (
     <div className="app-shell">
       <header className="app-header">
@@ -92,7 +112,7 @@ export default function App() {
           <Baby size={26} strokeWidth={2} />
           <div>
             <h1>Baby Boom</h1>
-            <p>Genetic &amp; environmental predictors of child IQ</p>
+            <p>An educational look at child development, not a diagnostic tool</p>
           </div>
         </div>
         <div className="app-header-actions">
@@ -111,14 +131,65 @@ export default function App() {
       </header>
 
       <main className="app-main">
-        {overview && (
-          <section className="stat-tile-row">
-            <StatTile icon={Users} label="Children in study" value={overview.n.toLocaleString()} sub={`born ${overview.yearRange[0]}–${overview.yearRange[1]}`} />
-            <StatTile icon={Brain} label="Mean child IQ" value={overview.iq.mean.toFixed(1)} sub={`SD ${overview.iq.sd.toFixed(1)} · median ${overview.iq.median.toFixed(0)}`} />
-            <StatTile icon={TrendingUp} label="Top-decile potential" value={`${(overview.highPotentialRate * 100).toFixed(1)}%`} sub="IQ in top 10%" />
-            <StatTile icon={ShieldCheck} label="Preterm births" value={`${(overview.pretermRate * 100).toFixed(1)}%`} sub={`${(overview.lowBirthWeightRate * 100).toFixed(1)}% low birth weight`} />
-          </section>
-        )}
+        <section className="hero">
+          <div className="hero-eyebrow">A public data-education experience</div>
+          <h1>Where do you sit among 50,000 childhoods?</h1>
+          <p>
+            Explore a synthetic research dataset of 50,000 simulated children to see how family background,
+            pregnancy, and early environment relate to a single narrow measure — a childhood IQ score. Build a
+            rough profile of your own background below, or just explore the population as a whole.
+          </p>
+        </section>
+
+        <DisclaimerCallout>
+          <strong>This is not an assessment of you or anyone else.</strong> The dataset is entirely synthetic —
+          generated to resemble patterns reported in developmental research, not drawn from real children. IQ is
+          one narrow, imperfect measure of cognitive ability, not a measure of worth or potential. Nothing you
+          enter here is stored, sent anywhere, or used for anything beyond this page.
+        </DisclaimerCallout>
+
+        {/* ---------------- 01 — Where do I sit? ---------------- */}
+        <SectionHeader
+          number="01"
+          title="Where do I sit?"
+          lede="Answer as many or as few questions as you like — the population average fills in anything you skip."
+        />
+
+        <div className="chart-grid-2">
+          <ChartCard title="Build a rough profile" subtitle="Based on your own background, growing up">
+            <ProfileBuilder profile={profile} onChange={setProfile} onReset={() => setProfile(emptyProfile())} />
+          </ChartCard>
+
+          <ChartCard
+            title={profileHasSelection ? "Where this profile sits" : "Where the population sits"}
+            subtitle="A transparent index built from group averages for the factors you selected — not a prediction"
+          >
+            {scoreResult && (
+              <PositionSummary
+                hasAnySelection={profileHasSelection}
+                score={scoreResult.score}
+                percentile={percentile}
+                contributions={scoreResult.contributions}
+              />
+            )}
+            {overview && distributions && scoreResult && (
+              <div style={{ marginTop: 18 }}>
+                <DensityChart
+                  bins={distributions.child_iq}
+                  markerValue={scoreResult.score}
+                  markerLabel={profileHasSelection ? "You" : "Average"}
+                />
+              </div>
+            )}
+          </ChartCard>
+        </div>
+
+        {/* ---------------- 02 — What's associated with this? ---------------- */}
+        <SectionHeader
+          number="02"
+          title="What's associated with this?"
+          lede="A synthetic population lets us trace, transparently, how these factors relate to each other and to the outcome measure — without any real child's data."
+        />
 
         {overview && correlations && byBinary && (
           <ChartCard
@@ -126,7 +197,25 @@ export default function App() {
             subtitle="A causal pathway from starting conditions to measured outcome — particles trace the flow continuously"
             footnote="Sublabels are computed from this dataset: Pearson r vs. child IQ, or the mean-IQ gap for preterm birth."
           >
-            <CausalFlowChart subtitles={flowSubtitles} />
+            <CausalFlowChart
+              subtitles={{
+                A: correlations.find((c) => c.column === "parental_ses")
+                  ? `SES r=${correlations.find((c) => c.column === "parental_ses")!.r.toFixed(2)}`
+                  : "…",
+                B: "Iodine · smoking · care",
+                D: correlations.find((c) => c.column === "home_stimulation_score")
+                  ? `Stimulation r=${correlations.find((c) => c.column === "home_stimulation_score")!.r.toFixed(2)}`
+                  : "…",
+                C: (() => {
+                  const pt = byBinary.preterm;
+                  const t = pt?.find((s) => s.key === true);
+                  const f = pt?.find((s) => s.key === false);
+                  return t && f ? `Preterm ${(t.mean - f.mean).toFixed(1)} IQ pts` : "…";
+                })(),
+                E: overview ? `mean ${overview.iq.mean.toFixed(0)}` : "…",
+                F: overview ? `${(overview.highPotentialRate * 100).toFixed(1)}% top-decile` : "…",
+              }}
+            />
           </ChartCard>
         )}
 
@@ -159,26 +248,10 @@ export default function App() {
           )}
         </div>
 
-        {distributions && (
-          <ChartCard
-            title="Distribution explorer"
-            subtitle="Smoothed density curve — shape of each variable across all 50,000 children"
-            actions={
-              <select value={densityVar} onChange={(e) => setDensityVar(e.target.value as typeof densityVar)} className="select-input">
-                {DENSITY_VARS.map((v) => (
-                  <option key={v} value={v}>{COLUMN_LABELS[v] ?? prettyKey(v)}</option>
-                ))}
-              </select>
-            }
-          >
-            <DensityChart bins={distributions[densityVar]} />
-          </ChartCard>
-        )}
-
         {overview && byCategory && (
           <ChartCard
             title="Category effects on IQ"
-            subtitle="Group mean IQ vs. the population mean — dot plot sorted low to high"
+            subtitle="Group mean IQ vs. the population mean — your selection (if any) is marked"
             actions={
               <select value={categoryVar} onChange={(e) => setCategoryVar(e.target.value as typeof categoryVar)} className="select-input">
                 {CATEGORY_VARS.map((v) => (
@@ -192,6 +265,7 @@ export default function App() {
               populationMean={overview.iq.mean}
               order={CATEGORY_ORDERS[categoryVar]}
               labelFor={prettyKey}
+              markerKey={markerKey}
             />
           </ChartCard>
         )}
@@ -219,6 +293,41 @@ export default function App() {
           >
             <ScatterWithMargins points={scatterSample} xKey={scatterVar} xLabel={COLUMN_LABELS[scatterVar]} />
           </ChartCard>
+        )}
+
+        {/* ---------------- 03 — What can be changed? ---------------- */}
+        <SectionHeader
+          number="03"
+          title="What can be changed?"
+          lede="The strongest associations in this dataset — genetics, SES, birth history — are also the ones nobody can act on after the fact. The smaller, modifiable ones are where real intervention happens."
+        />
+
+        {correlations && (
+          <ChartCard
+            title="Fixed history vs. shapeable environment"
+            subtitle="Same dataset, split by whether a caregiver could still influence the factor today"
+          >
+            <FactorSplit correlations={correlations} />
+          </ChartCard>
+        )}
+
+        <DisclaimerCallout>
+          Correlation is not causation, and every association above is diluted by this dataset's substantial
+          random component — real children's outcomes are shaped by far more than any dataset can capture. Treat
+          this as an illustration of how developmental research findings tend to look in aggregate, not as
+          guidance for any individual child or family.
+        </DisclaimerCallout>
+
+        {/* ---------------- appendix: about the dataset ---------------- */}
+        <SectionHeader number="—" title="About this dataset" lede="For the curious: methodology, validation, and the full column reference." />
+
+        {overview && (
+          <section className="stat-tile-row">
+            <StatTile icon={Users} label="Simulated children" value={overview.n.toLocaleString()} sub={`born ${overview.yearRange[0]}–${overview.yearRange[1]}`} />
+            <StatTile icon={Brain} label="Mean child IQ" value={overview.iq.mean.toFixed(1)} sub={`SD ${overview.iq.sd.toFixed(1)} · median ${overview.iq.median.toFixed(0)}`} />
+            <StatTile icon={TrendingUp} label="Top-decile potential" value={`${(overview.highPotentialRate * 100).toFixed(1)}%`} sub="IQ in top 10%" />
+            <StatTile icon={ShieldCheck} label="Preterm births" value={`${(overview.pretermRate * 100).toFixed(1)}%`} sub={`${(overview.lowBirthWeightRate * 100).toFixed(1)}% low birth weight`} />
+          </section>
         )}
 
         {dictionary && (

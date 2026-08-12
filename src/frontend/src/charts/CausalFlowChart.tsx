@@ -19,12 +19,12 @@ const W = 960;
 const H = 300;
 
 const BASE_NODES: Omit<FlowNode, "sublabel">[] = [
-  { id: "A", label: "Parental IQ & SES", color: "var(--series-1)", cx: 95, cy: 150 },
-  { id: "B", label: "Prenatal environment", color: "var(--series-3)", cx: 320, cy: 68 },
-  { id: "D", label: "Early-life environment", color: "var(--series-6)", cx: 320, cy: 232 },
-  { id: "C", label: "Birth outcomes", color: "var(--series-2)", cx: 545, cy: 68 },
-  { id: "E", label: "Child IQ", color: "var(--series-5)", cx: 730, cy: 150 },
-  { id: "F", label: "Cognitive potential", color: "var(--series-8)", cx: 900, cy: 150 },
+  { id: "A", label: "Parental IQ & SES", color: "var(--series-1)", cx: 95, cy: 150 }, // burgundy — genetics/parental
+  { id: "B", label: "Prenatal environment", color: "var(--series-4)", cx: 320, cy: 68 }, // ochre — interaction/overlap
+  { id: "D", label: "Early-life environment", color: "var(--series-2)", cx: 320, cy: 232 }, // sage — environment
+  { id: "C", label: "Birth outcomes", color: "var(--series-7)", cx: 545, cy: 68 }, // slate blue
+  { id: "E", label: "Child IQ", color: "var(--series-5)", cx: 730, cy: 150 }, // teal
+  { id: "F", label: "Cognitive potential", color: "var(--series-8)", cx: 900, cy: 150 }, // terracotta
 ];
 
 function right(n: Omit<FlowNode, "sublabel">) {
@@ -108,7 +108,7 @@ export function CausalFlowChart({ subtitles }: Props) {
                 </animateMotion>
               </circle>
             ))}
-            <circle r={4} fill="var(--series-6)" opacity={0.85}>
+            <circle r={4} fill="var(--series-2)" opacity={0.85}>
               <animateMotion dur={`${BRANCH_DUR}s`} repeatCount="indefinite">
                 <mpath href="#flow-branch-path" />
               </animateMotion>
