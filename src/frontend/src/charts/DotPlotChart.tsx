@@ -53,7 +53,14 @@ export function DotPlotChart({ data, populationMean, order, labelFor }: Props) {
               <text x={M.left - 12} y={cy} textAnchor="end" dominantBaseline="middle" className="lollipop-label">
                 {labelFor ? labelFor(d.key) : d.key}
               </text>
-              <line x1={x(populationMean)} x2={x(d.mean)} y1={cy} y2={cy} className="dotplot-stem" />
+              <line
+                x1={x(populationMean)}
+                x2={x(d.mean)}
+                y1={cy}
+                y2={cy}
+                className="dotplot-stem flow-dash"
+                style={{ animationDelay: `${i * 0.1}s`, animationDirection: above ? "normal" : "reverse" }}
+              />
               <circle
                 cx={x(d.mean)}
                 cy={cy}
@@ -61,6 +68,8 @@ export function DotPlotChart({ data, populationMean, order, labelFor }: Props) {
                 fill={above ? "var(--diverging-pos)" : "var(--diverging-neg)"}
                 stroke="var(--chart-surface)"
                 strokeWidth={1.5}
+                className="pulse-dot"
+                style={{ animationDelay: `${i * 0.15}s` }}
               />
             </g>
           );

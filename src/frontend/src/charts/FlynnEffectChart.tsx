@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import type { GroupStat } from "../lib/types";
 import { linearScale, niceTicks } from "../lib/scale";
 import { ChartTooltip } from "../components/ChartTooltip";
+import { useReducedMotion } from "../lib/useReducedMotion";
 
 interface Props {
   data: GroupStat[];
@@ -13,6 +14,7 @@ const M = { top: 16, right: 20, bottom: 32, left: 44 };
 
 export function FlynnEffectChart({ data }: Props) {
   const [hover, setHover] = useState<number | null>(null);
+  const reducedMotion = useReducedMotion();
 
   const points = useMemo(
     () =>
@@ -56,8 +58,9 @@ export function FlynnEffectChart({ data }: Props) {
           </text>
         ))}
 
-        <path d={bandPath} fill="var(--series-1)" opacity={0.14} />
+        <path d={bandPath} fill="var(--series-1)" opacity={0.14} className="breathe-area" />
         <path d={linePath} fill="none" stroke="var(--series-1)" strokeWidth={2} strokeLinejoin="round" strokeLinecap="round" />
+        <path id="flynn-comet-path" d={linePath} fill="none" stroke="none" />
 
         {points.map((p, i) => (
           <circle
@@ -68,11 +71,20 @@ export function FlynnEffectChart({ data }: Props) {
             fill="var(--series-1)"
             stroke="var(--chart-surface)"
             strokeWidth={1.5}
+            className="pulse-dot"
+            style={{ cursor: "pointer", animationDelay: `${i * 0.15}s` }}
             onMouseEnter={() => setHover(i)}
             onMouseLeave={() => setHover(null)}
-            style={{ cursor: "pointer" }}
           />
         ))}
+
+        {!reducedMotion && (
+          <circle r={4.5} fill="var(--series-1)" opacity={0.9}>
+            <animateMotion dur="7s" repeatCount="indefinite" rotate="auto">
+              <mpath href="#flynn-comet-path" />
+            </animateMotion>
+          </circle>
+        )}
 
         <line x1={M.left} x2={M.left} y1={M.top} y2={H - M.bottom} className="axis-baseline" />
         <line x1={M.left} x2={W - M.right} y1={H - M.bottom} y2={H - M.bottom} className="axis-baseline" />

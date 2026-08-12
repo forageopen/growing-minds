@@ -96,9 +96,10 @@ export function ScatterWithMargins({ points, xKey, xLabel }: Props) {
             r={hover === i ? 5 : 2.6}
             fill={p.high_cognitive_potential ? "var(--series-8)" : "var(--series-1)"}
             opacity={hover === i ? 1 : 0.55}
+            className={p.high_cognitive_potential ? "pulse-dot" : undefined}
+            style={{ cursor: "pointer", animationDelay: p.high_cognitive_potential ? `${(i % 14) * 0.18}s` : undefined }}
             onMouseEnter={() => setHover(i)}
             onMouseLeave={() => setHover(null)}
-            style={{ cursor: "pointer" }}
           />
         ))}
 
@@ -109,8 +110,8 @@ export function ScatterWithMargins({ points, xKey, xLabel }: Props) {
           y2={y(slope * xDomain[1] + intercept)}
           stroke="var(--abd-text-primary)"
           strokeWidth={2}
-          strokeDasharray="6 4"
           opacity={0.55}
+          className="flow-dash-slow"
         />
 
         <line x1={M.left} x2={M.left} y1={M.top + MARGIN_SIZE} y2={H - M.bottom} className="axis-baseline" />

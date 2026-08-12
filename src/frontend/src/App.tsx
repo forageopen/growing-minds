@@ -19,6 +19,7 @@ import { ChartCard } from "./components/ChartCard";
 import { ThemeToggle } from "./components/ThemeToggle";
 import { DictionaryTable } from "./components/DictionaryTable";
 
+import { CausalFlowChart } from "./charts/CausalFlowChart";
 import { FlynnEffectChart } from "./charts/FlynnEffectChart";
 import { LollipopChart } from "./charts/LollipopChart";
 import { DensityChart } from "./charts/DensityChart";
@@ -56,6 +57,22 @@ export default function App() {
   const [densityVar, setDensityVar] = useState<(typeof DENSITY_VARS)[number]>("child_iq");
   const [categoryVar, setCategoryVar] = useState<(typeof CATEGORY_VARS)[number]>("household_income_bracket");
   const [scatterVar, setScatterVar] = useState<(typeof SCATTER_VARS)[number]>("mother_iq");
+
+  const corrFor = (col: string) => correlations?.find((c) => c.column === col)?.r;
+  const pretermStats = byBinary?.preterm;
+  const pretermGap =
+    pretermStats && pretermStats.find((s) => s.key === true) && pretermStats.find((s) => s.key === false)
+      ? pretermStats.find((s) => s.key === true)!.mean - pretermStats.find((s) => s.key === false)!.mean
+      : undefined;
+
+  const flowSubtitles = {
+    A: corrFor("parental_ses") !== undefined ? `SES r=${corrFor("parental_ses")!.toFixed(2)}` : "…",
+    B: "Iodine · smoking · care",
+    D: corrFor("home_stimulation_score") !== undefined ? `Stimulation r=${corrFor("home_stimulation_score")!.toFixed(2)}` : "…",
+    C: pretermGap !== undefined ? `Preterm ${pretermGap.toFixed(1)} IQ pts` : "…",
+    E: overview ? `mean ${overview.iq.mean.toFixed(0)}` : "…",
+    F: overview ? `${(overview.highPotentialRate * 100).toFixed(1)}% top-decile` : "…",
+  } as const;
 
   const dumbbellRows: DumbbellRow[] = byBinary
     ? BINARY_FACTORS.map(({ key, label }) => {
@@ -101,6 +118,16 @@ export default function App() {
             <StatTile icon={TrendingUp} label="Top-decile potential" value={`${(overview.highPotentialRate * 100).toFixed(1)}%`} sub="IQ in top 10%" />
             <StatTile icon={ShieldCheck} label="Preterm births" value={`${(overview.pretermRate * 100).toFixed(1)}%`} sub={`${(overview.lowBirthWeightRate * 100).toFixed(1)}% low birth weight`} />
           </section>
+        )}
+
+        {overview && correlations && byBinary && (
+          <ChartCard
+            title="How the factors flow into child IQ"
+            subtitle="A causal pathway from starting conditions to measured outcome — particles trace the flow continuously"
+            footnote="Sublabels are computed from this dataset: Pearson r vs. child IQ, or the mean-IQ gap for preterm birth."
+          >
+            <CausalFlowChart subtitles={flowSubtitles} />
+          </ChartCard>
         )}
 
         {flynnEffect && (

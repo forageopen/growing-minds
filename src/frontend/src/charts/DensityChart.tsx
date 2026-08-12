@@ -1,8 +1,9 @@
-import { useMemo, useState } from "react";
+import { useId, useMemo, useState } from "react";
 import type { HistBin } from "../lib/types";
 import { linearScale, niceTicks } from "../lib/scale";
 import { kde } from "../lib/stats";
 import { ChartTooltip } from "../components/ChartTooltip";
+import { useReducedMotion } from "../lib/useReducedMotion";
 
 interface Props {
   bins: HistBin[];
@@ -16,6 +17,8 @@ const M = { top: 12, right: 16, bottom: 28, left: 16 };
 
 export function DensityChart({ bins, color = "var(--series-1)", unit = "" }: Props) {
   const [hoverX, setHoverX] = useState<number | null>(null);
+  const reducedMotion = useReducedMotion();
+  const pathId = `density-comet-${useId().replace(/[^a-zA-Z0-9]/g, "")}`;
   const curve = useMemo(() => kde(bins, 80), [bins]);
 
   const x0 = bins[0].x0;
@@ -52,8 +55,16 @@ export function DensityChart({ bins, color = "var(--series-1)", unit = "" }: Pro
             </text>
           </g>
         ))}
-        <path d={areaPath} fill={color} opacity={0.16} />
+        <path d={areaPath} fill={color} opacity={0.16} className="breathe-area" />
         <path d={linePath} fill="none" stroke={color} strokeWidth={2} strokeLinejoin="round" strokeLinecap="round" />
+        <path id={pathId} d={linePath} fill="none" stroke="none" />
+        {!reducedMotion && (
+          <circle r={4} fill={color}>
+            <animateMotion dur="5s" repeatCount="indefinite">
+              <mpath href={`#${pathId}`} />
+            </animateMotion>
+          </circle>
+        )}
         <line x1={M.left} x2={W - M.right} y1={H - M.bottom} y2={H - M.bottom} className="axis-baseline" />
 
         {nearest && (

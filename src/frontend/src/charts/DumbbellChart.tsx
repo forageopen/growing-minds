@@ -48,9 +48,17 @@ export function DumbbellChart({ rows, presentLabel, absentLabel }: Props) {
               <text x={M.left - 12} y={cy} textAnchor="end" dominantBaseline="middle" className="lollipop-label">
                 {r.label}
               </text>
-              <line x1={x(r.absent.mean)} x2={x(r.present.mean)} y1={cy} y2={cy} className="dumbbell-connector" strokeWidth={isHover ? 3 : 2} />
-              <circle cx={x(r.absent.mean)} cy={cy} r={isHover ? 7 : 5.5} fill="var(--series-6)" stroke="var(--chart-surface)" strokeWidth={1.5} />
-              <circle cx={x(r.present.mean)} cy={cy} r={isHover ? 7 : 5.5} fill="var(--series-8)" stroke="var(--chart-surface)" strokeWidth={1.5} />
+              <line
+                x1={x(r.absent.mean)}
+                x2={x(r.present.mean)}
+                y1={cy}
+                y2={cy}
+                className="dumbbell-connector flow-dash"
+                strokeWidth={isHover ? 3 : 2}
+                style={{ animationDelay: `${i * 0.1}s` }}
+              />
+              <circle cx={x(r.absent.mean)} cy={cy} r={isHover ? 7 : 5.5} fill="var(--series-6)" stroke="var(--chart-surface)" strokeWidth={1.5} className="pulse-dot" style={{ animationDelay: `${i * 0.15}s` }} />
+              <circle cx={x(r.present.mean)} cy={cy} r={isHover ? 7 : 5.5} fill="var(--series-8)" stroke="var(--chart-surface)" strokeWidth={1.5} className="pulse-dot" style={{ animationDelay: `${i * 0.15 + 0.3}s` }} />
             </g>
           );
         })}

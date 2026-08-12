@@ -2,6 +2,64 @@
   box-sizing: border-box;
 }
 
+/* ---- shared looping chart animation --------------------------------- */
+@keyframes pulse-soft {
+  0%, 100% { transform: scale(1); opacity: 0.92; }
+  50% { transform: scale(1.28); opacity: 1; }
+}
+@keyframes dash-flow {
+  to { stroke-dashoffset: -20; }
+}
+@keyframes dash-flow-slow {
+  to { stroke-dashoffset: -32; }
+}
+@keyframes shimmer-sweep {
+  from { transform: translateX(-45%); }
+  to { transform: translateX(145%); }
+}
+@keyframes breathe-y {
+  0%, 100% { transform: scaleY(1); }
+  50% { transform: scaleY(1.035); }
+}
+@keyframes comet-fade {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 1; }
+}
+
+.pulse-dot {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: pulse-soft 2.6s ease-in-out infinite;
+}
+.flow-dash {
+  stroke-dasharray: 5 7;
+  animation: dash-flow 0.9s linear infinite;
+}
+.flow-dash-slow {
+  stroke-dasharray: 4 5;
+  animation: dash-flow-slow 2.4s linear infinite;
+}
+.breathe-area {
+  transform-box: fill-box;
+  transform-origin: bottom;
+  animation: breathe-y 4s ease-in-out infinite;
+}
+.shimmer-rect {
+  animation: shimmer-sweep 4.2s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pulse-dot,
+  .flow-dash,
+  .flow-dash-slow,
+  .breathe-area,
+  .shimmer-rect,
+  .flow-comet,
+  .node-pulse {
+    animation: none !important;
+  }
+}
+
 html, body {
   margin: 0;
   padding: 0;
@@ -258,6 +316,17 @@ a {
 .heatmap-value {
   font-size: 11px;
   font-weight: 600;
+}
+
+.flow-node-label {
+  font-size: 12px;
+  font-weight: 600;
+  fill: var(--abd-text-primary);
+}
+
+.flow-node-sublabel {
+  font-size: 10.5px;
+  font-weight: 500;
 }
 
 .chart-tooltip {

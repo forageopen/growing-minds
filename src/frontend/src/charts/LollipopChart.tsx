@@ -43,8 +43,28 @@ export function LollipopChart({ data, labels }: Props) {
               <text x={M.left - 12} y={cy} textAnchor="end" dominantBaseline="middle" className="lollipop-label">
                 {labels[d.column] ?? d.column}
               </text>
-              <line x1={zero} x2={x(d.r)} y1={cy} y2={cy} stroke={color} strokeWidth={isHover ? 3 : 2} strokeLinecap="round" opacity={isHover ? 1 : 0.85} />
-              <circle cx={x(d.r)} cy={cy} r={isHover ? 6 : 4.5} fill={color} stroke="var(--chart-surface)" strokeWidth={1.5} />
+              <line
+                x1={zero}
+                x2={x(d.r)}
+                y1={cy}
+                y2={cy}
+                stroke={color}
+                strokeWidth={isHover ? 3 : 2}
+                strokeLinecap="round"
+                opacity={isHover ? 1 : 0.85}
+                className="flow-dash"
+                style={{ animationDelay: `${i * 0.08}s`, animationDirection: positive ? "normal" : "reverse" }}
+              />
+              <circle
+                cx={x(d.r)}
+                cy={cy}
+                r={isHover ? 6 : 4.5}
+                fill={color}
+                stroke="var(--chart-surface)"
+                strokeWidth={1.5}
+                className="pulse-dot"
+                style={{ animationDelay: `${i * 0.12}s` }}
+              />
               {isHover && (
                 <text x={x(d.r) + (positive ? 12 : -12)} y={cy} textAnchor={positive ? "start" : "end"} dominantBaseline="middle" className="lollipop-value">
                   {d.r.toFixed(2)}
