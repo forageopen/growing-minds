@@ -15,7 +15,7 @@ interface Props {
 
 const NODE_W = 148;
 const NODE_H = 60;
-const W = 960;
+const W = 1000;
 const H = 300;
 
 const BASE_NODES: Omit<FlowNode, "sublabel">[] = [
