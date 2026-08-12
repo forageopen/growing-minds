@@ -37,6 +37,7 @@ import { InfoTip } from "./components/InfoTip";
 import { VariableSelectionCaseStudy } from "./components/VariableSelectionCaseStudy";
 import { AcademicNote } from "./components/AcademicNote";
 import { ReadingList } from "./components/ReadingList";
+import { ProjectStructure } from "./components/ProjectStructure";
 
 import { CausalFlowChart } from "./charts/CausalFlowChart";
 import { FlynnEffectChart } from "./charts/FlynnEffectChart";
@@ -170,19 +171,9 @@ export default function App() {
 
         <DisclaimerCallout>
           <p>
-            <strong>This is not an assessment of you or anyone else.</strong> No real child or study participant
-            appears in this dataset. Every row is procedurally generated. The relationships modeled in the dataset
-            are informed by findings reported in published research and meta-analyses, including parental-IQ
-            correlations, childhood heritability estimates, iodine deficiency, lead exposure, and environmental
-            influences on development. These findings were used to calibrate the synthetic model and should not be
-            interpreted as measurements or predictions of real individuals. See "About this dataset" for the
-            methodology and sources.
-          </p>
-          <p>
-            IQ is a narrow and imperfect measure of certain aspects of cognitive performance. It does not measure a
-            person's worth, character, creativity, or future potential. The profile you create here is an
-            exploration of population-level patterns, not a prediction of your own ability or development. Nothing
-            you enter here is stored, sent anywhere, or used for anything beyond this page.
+            <strong>This isn't an assessment of you or anyone else.</strong> The dataset is entirely synthetic, and
+            nothing you enter here is stored or sent anywhere. IQ is a narrow, imperfect measure — see "About this
+            dataset" near the bottom of the page for the full picture on methodology and limits.
           </p>
         </DisclaimerCallout>
 
@@ -195,15 +186,14 @@ export default function App() {
           lede="Answer as many or as few questions as you like — the population average fills in anything you skip."
         />
 
-        <AcademicNote>
-          Human development resists summary by any single indicator. The capability approach underlying the
-          human-development paradigm treats well-being as inherently multidimensional — what a person is able to
-          do and be — and composite indices inevitably lose the trade-offs between the dimensions they combine
-          (Fukuda-Parr, 2003). Aggregate averages compound the problem: population-level statistics routinely mask
-          substantial variation at the individual and sub-national scale (Hopkins et al., 2023). The profile below
-          exists for that reason — not to produce a verdict, but to place one configuration of factors against the
-          shape of the whole population, so the gap between "the average" and "this specific combination" stays
-          visible instead of collapsing into a single number.
+        <AcademicNote title="Why show the whole population, not just you">
+          No single number can describe a childhood, so this page leads with a full picture instead of a verdict.
+          Below, you'll see the whole population laid out as a curve, with whatever profile you build placed on
+          top of it — never shown by itself. That's not just a design preference: when researchers tested how well
+          people understand population statistics, comprehension roughly doubled when a chart kept the whole
+          population visible instead of showing only the group being highlighted, and the effect was strongest for
+          people who don't work with numbers often (Garcia-Retamero &amp; Galesic, 2010). Seeing the shape of
+          everyone else is what makes one person's position mean anything at all.
         </AcademicNote>
 
         <div className="chart-grid-2">
@@ -217,14 +207,14 @@ export default function App() {
             explainer={
               <>
                 <p>
-                  The big number is a <strong>composite index</strong>: start at the population average, then add
-                  or subtract each factor's known effect for the options you picked. It is not a real IQ score and
-                  was never run through any test — it only reflects the handful of factors you selected.
+                  The big number isn't a real IQ score — nobody took a test. It's simpler than that: start at the
+                  population average, then add or subtract each factor's known effect for whatever you picked. It
+                  only reflects the handful of factors you selected, nothing more.
                 </p>
                 <p>
-                  It's shown as a range rather than one number because a single figure would claim more precision
-                  than the underlying data supports — see "Why variable selection matters" near the bottom of the
-                  page for exactly how much this index can and can't claim.
+                  It's shown as a range rather than one number because a single figure would look more precise
+                  than it really is — see "Why variable selection matters" near the bottom of the page for exactly
+                  how much this index can and can't claim.
                 </p>
               </>
             }
@@ -250,6 +240,18 @@ export default function App() {
             )}
           </ChartCard>
         </div>
+
+        <AcademicNote title="Why this is a range, not a single number">
+          People aren't great at guessing where they fall on a scale — and the people furthest from average tend
+          to be the most confident they're near it. One study of health habits found this pattern again and
+          again: people rated themselves as healthier than they were, and the people doing the least healthy
+          things were usually the most surprised to hear it (Miller et al., 2019). Just showing someone a
+          comparison doesn't fix this on its own, either — later research found that generic "here's the average
+          person" feedback barely changed anyone's self-assessment, and what actually helped was telling people
+          how far off guesses like theirs usually are (Fellner-Röhling et al., 2023). That's why the number above
+          is shown as a range, with a plain explanation of what it leaves out, instead of one clean figure you're
+          left to read however you'd like.
+        </AcademicNote>
 
         {/* ---------------- 02 — What's associated with this? ---------------- */}
         <SectionHeader
@@ -311,16 +313,18 @@ export default function App() {
           </ChartCard>
         )}
 
-        <AcademicNote>
-          No single chart is sufficient for multi-level data. Research on how audiences interpret data
-          visualizations of inequity found that individual-level views draw attention to outliers, group-level
-          views prompt more cautious contextual reasoning, and derived summary statistics can create false
-          certainty when shown alone — different forms support different, complementary judgments, and none is
-          adequate by itself (Reinholz et al., 2023). That is the reasoning behind pairing a per-factor ranking
-          (the lollipop chart below) with a full pairwise correlation matrix (the heatmap beside it): the first
-          shows each factor's own association with the outcome; the second shows how those factors relate to
-          each other — exactly the overlap the profile engine has to correct for, and information a ranked list
-          alone cannot reveal.
+        <AcademicNote title="Why there's more than one chart here">
+          One chart never tells the whole story. Researchers who studied how people read charts about fairness in
+          classrooms found that a chart showing individuals draws attention to specific outliers, a chart showing
+          groups invites more careful, contextual thinking, and a single summary number can feel more certain than
+          it really is — each view teaches you something different, and none of them alone is enough (Reinholz et
+          al., 2023). That's why the next two charts sit side by side: one ranks each factor's own link to child
+          IQ, the other shows how those factors overlap with each other — something a ranked list can't tell you.
+          And interactivity by itself doesn't make any of this easier to understand, for what it's worth. In
+          controlled experiments, adding hover effects and toggles to an already-clear chart didn't improve how
+          well people reasoned about it, and sometimes made things worse. What did help was interaction that asked
+          people to guess first and then showed them the answer (Okan et al., 2015; Mosca et al., 2021). That's the
+          spirit every interactive element on this page was built with.
         </AcademicNote>
 
         <div className="chart-grid-2">
@@ -433,15 +437,14 @@ export default function App() {
           lede="The strongest associations in this dataset — genetics, SES, birth history — are also the ones nobody can act on after the fact. The smaller, modifiable ones are where real intervention happens."
         />
 
-        <AcademicNote>
-          Distinguishing what is fixed from what remains open is not just an analytic convenience — it reflects
-          how developmental outcomes are actually produced. Community-based systems-dynamics research modeling
-          children's social and emotional well-being found that distal factors — policy investment, service wait
-          times, caregiver stress — are causally linked to individual outcomes through feedback loops spanning
-          government, community, interpersonal, and family levels (Poon et al., 2022). Calling a factor "fixed"
-          therefore describes its status for one child at one point in time, not its status as a lever for policy
-          or future intervention: the same factor can be unchangeable in a retrospective profile and still be
-          exactly where an upstream investment would matter most.
+        <AcademicNote title="What &quot;fixed&quot; actually means">
+          Calling something "fixed" doesn't mean it was always going to happen — it means it's already happened,
+          for this particular child. Researchers who mapped out how children's well-being actually gets shaped
+          found long chains of cause and effect: government funding decisions affect how long families wait for
+          services, which affects caregiver stress, which affects a child's day-to-day environment (Poon et al.,
+          2022). None of those links show up in a snapshot of one child's history. So when a factor below is
+          labeled "fixed," that's only true in the narrow sense that nothing can be done about it now — it may
+          still be exactly the kind of thing worth investing in for the next child.
         </AcademicNote>
 
         {correlations && (
@@ -475,6 +478,18 @@ export default function App() {
           lede="Two real decisions from building this page, and what each one cost — for anyone setting up their own analysis."
         />
 
+        <AcademicNote title="Why several variables together are harder to reason about than one">
+          Looking at several variables at once is harder than it sounds, and most of us are worse at it than we'd
+          guess. Studies of how people reason about samples and evidence show that even careful, numerate readers
+          make mistakes when combining several pieces of statistical information — and those mistakes shrink the
+          more comfortable someone is with numbers to begin with (Chesney &amp; Obrecht, 2011). Separate research on
+          students working with real scientific datasets found that the people who actually understood what was
+          going on weren't the ones who could read a single chart correctly — they were the ones who could compare
+          charts against each other and connect the data back to an explanation (Resnick, Kastens, &amp; Shipley,
+          2018). The case study below tries to make that kind of comparison explicit instead of assuming you'll do
+          it in your head.
+        </AcademicNote>
+
         {regression && idealCeiling && (
           <ChartCard title="A case study in this project's own data" subtitle="Computed live from the current engine">
             <VariableSelectionCaseStudy
@@ -486,14 +501,14 @@ export default function App() {
           </ChartCard>
         )}
 
-        <AcademicNote>
-          Visualization's value is not confined to analysis. Data visualization has been used deliberately as a
-          tool for empowerment — layering statistical trends with personal narrative so data becomes a platform
-          for dialogue rather than a one-way report (Rojas &amp; Ju, 2009) — and to enable collective,
-          socially-supported interpretation of data across non-expert audiences (Heer &amp; Hellerstein, 2009).
-          That is the reason this page was built as something to interact with rather than a static report:
-          understanding a population's patterns is only useful insofar as it returns some agency to the person
-          doing the looking.
+        <AcademicNote title="Why this is something to use, not just read">
+          Data is more useful when it's something you can push back on, not just something you're told. One
+          project paired population statistics with people's own stories, turning a one-way report into something
+          closer to a conversation (Rojas &amp; Ju, 2009), and other researchers have found real value in letting
+          people explore and compare data themselves rather than just handing them a finished conclusion (Heer
+          &amp; Hellerstein, 2009). That's really the point of building this page as something you interact with
+          instead of a report you read once: understanding a population's patterns is only useful if it leaves you
+          with something to do with it.
         </AcademicNote>
 
         {/* ---------------- appendix: about the dataset ---------------- */}
@@ -530,8 +545,35 @@ export default function App() {
           </p>
         </ChartCard>
 
+        <DisclaimerCallout>
+          <p>
+            <strong>The full disclaimer, in case you skipped it up top:</strong> no real child or study participant
+            appears in this dataset — every row is procedurally generated. The relationships modeled here are
+            informed by findings reported in published research and meta-analyses, including parental-IQ
+            correlations, childhood heritability estimates, iodine deficiency, lead exposure, and environmental
+            influences on development. Those findings were used to calibrate the synthetic model above and should
+            not be interpreted as measurements or predictions of real individuals.
+          </p>
+          <p>
+            IQ is a narrow and imperfect measure of certain aspects of cognitive performance. It does not measure a
+            person's worth, character, creativity, or future potential. The profile you can build on this page is
+            an exploration of population-level patterns, not a prediction of your own ability or development.
+            Nothing you enter here is stored, sent anywhere, or used for anything beyond this page.
+          </p>
+        </DisclaimerCallout>
+
         <ChartCard title="Further reading" subtitle="The research cited in the notes throughout this page">
           <ReadingList />
+        </ChartCard>
+
+        <SectionHeader
+          number="—"
+          title="The full picture"
+          lede="Every question this project was built to answer, laid out in order — the structure behind everything above."
+        />
+
+        <ChartCard title="Project notes" subtitle="A complete breakdown, not a summary">
+          <ProjectStructure />
         </ChartCard>
 
         {dictionary && (

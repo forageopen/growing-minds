@@ -14,7 +14,7 @@ export function FactorSplit({ correlations }: Props) {
     <div className="factor-split">
       <div className="factor-column">
         <h4><Lock size={14} style={{ verticalAlign: "-2px", marginRight: 6 }} /> Already settled, by the time you're reading this</h4>
-        <p>Parental background, pregnancy history, and birth circumstances — real associations, but not something anyone can act on retroactively.</p>
+        <p>Parental background, pregnancy history, and birth circumstances — real patterns, but nothing anyone can change after the fact.</p>
         <ul className="factor-list">
           {fixed.map((c) => (
             <li key={c.column}>
@@ -26,7 +26,7 @@ export function FactorSplit({ correlations }: Props) {
       </div>
       <div className="factor-column">
         <h4><Sprout size={14} style={{ verticalAlign: "-2px", marginRight: 6 }} /> Still shapeable for a child today</h4>
-        <p>Smaller individual associations than genetics or SES, but these are the levers actually available to a caregiver, teacher, or policy going forward.</p>
+        <p>Smaller effects than genetics or SES, but these are the things a caregiver, teacher, or policy could still actually change.</p>
         <ul className="factor-list">
           {modifiable.map((c) => (
             <li key={c.column}>

@@ -329,7 +329,14 @@ export function computeScore(profile: Profile, inputs: ScoreInputs): ScoreResult
     const betaIdx = regression.variables.indexOf(field.id);
     if (value === undefined || !varStats || varStats.sd === 0 || betaIdx === -1) continue;
     const beta = regression.betas[betaIdx];
-    const z = (value - varStats.mean) / varStats.sd;
+    // Sliders intentionally go wide enough to fit real answers outside the
+    // dataset's typical range (e.g. breastfeeding for years, not months).
+    // But a linear model has no business extrapolating a z-score of 13 —
+    // past a few SD out, the "effect per SD" this model was fit on stops
+    // meaning anything. Clamp the input to the model, not the slider, so
+    // an honest answer never produces a nonsense score.
+    const rawZ = (value - varStats.mean) / varStats.sd;
+    const z = Math.max(-4, Math.min(4, rawZ));
     const delta = z * beta * popSd;
     score += delta;
     contributions.push({ label: field.question, delta });

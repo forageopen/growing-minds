@@ -19,10 +19,9 @@ export function VariableSelectionCaseStudy({ naiveR2, correctedR2, idealScore, i
       <div className="case-study-block">
         <h4>1. Combining correlated variables without correcting for overlap</h4>
         <p>
-          This tool's profile index originally summed each factor's own correlation with child IQ independently.
-          But several factors — maternal education, home stimulation, nutrition — all partly track the same
-          underlying socioeconomic status. Summing their raw correlations counts that shared variance more than
-          once.
+          This tool's profile index originally added up each factor's own correlation with child IQ, one at a
+          time. But several factors — maternal education, home stimulation, nutrition — all partly reflect the
+          same socioeconomic status. Adding their raw correlations counts that overlap more than once.
         </p>
         <div className="case-study-numbers">
           <div>
@@ -35,10 +34,10 @@ export function VariableSelectionCaseStudy({ naiveR2, correctedR2, idealScore, i
           </div>
         </div>
         <p>
-          The naive approach overstated the combined explanatory power by about <strong>{overstatement.toFixed(0)}%</strong>.
-          The fix — standardized multiple-regression coefficients, solved from the full predictor correlation
-          matrix — is the same correction any multivariable analysis needs before its numbers can be trusted
-          together, not just one at a time.
+          Adding the raw correlations overstated how much these factors explained together by about{" "}
+          <strong>{overstatement.toFixed(0)}%</strong>. The fix was to work out each factor's own contribution
+          properly, accounting for how much it overlaps with the others — the same correction any analysis needs
+          before you can trust several variables added together, not just one at a time.
         </p>
       </div>
 

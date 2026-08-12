@@ -4,3 +4,8 @@ dist/
 *.log
 .vite/
 *.tsbuildinfo
+
+# Personal research reference notes (contain sci-hub links) — never publish.
+# Only the extracted citation metadata (author/year/title/venue/DOI) is used
+# in the app itself, via ReadingList.tsx.
+data/raw/*.md

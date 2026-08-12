@@ -26,9 +26,9 @@ export function PositionSummary({ hasAnySelection, score, percentile, percentile
       </div>
 
       <p className="position-note">
-        Shown as a range, not a point, because this index only reflects the factors you selected — it deliberately
-        excludes parental IQ and other unmeasured traits, the strongest individual predictors in this dataset. It
-        will rarely reach the extremes a real psychometric test can.
+        This is shown as a range, not one number, because it only reflects the handful of factors you chose to
+        answer. It leaves out parental IQ and other traits we don't ask about — which happen to be the strongest
+        predictors in this whole dataset — so it will rarely reach the extremes a real IQ test could.
       </p>
 
       {hasAnySelection && top.length > 0 && (
