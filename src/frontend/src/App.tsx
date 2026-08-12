@@ -187,13 +187,18 @@ export default function App() {
         />
 
         <AcademicNote title="Why show the whole population, not just you">
-          No single number can describe a childhood, so this page leads with a full picture instead of a verdict.
-          Below, you'll see the whole population laid out as a curve, with whatever profile you build placed on
-          top of it — never shown by itself. That's not just a design preference: when researchers tested how well
-          people understand population statistics, comprehension roughly doubled when a chart kept the whole
-          population visible instead of showing only the group being highlighted, and the effect was strongest for
-          people who don't work with numbers often (Garcia-Retamero &amp; Galesic, 2010). Seeing the shape of
-          everyone else is what makes one person's position mean anything at all.
+          <p>
+            No single number can describe a childhood, so this page leads with a full picture instead of a
+            verdict. Below, you'll see the whole population laid out as a curve, with whatever profile you build
+            placed on top of it — never shown by itself.
+          </p>
+          <p>
+            That's not just a design preference: when researchers tested how well people understand population
+            statistics, comprehension roughly doubled when a chart kept the whole population visible instead of
+            showing only the group being highlighted, and the effect was strongest for people who don't work with
+            numbers often (Garcia-Retamero &amp; Galesic, 2010). Seeing the shape of everyone else is what makes
+            one person's position mean anything at all.
+          </p>
         </AcademicNote>
 
         <div className="chart-grid-2">
@@ -242,15 +247,19 @@ export default function App() {
         </div>
 
         <AcademicNote title="Why this is a range, not a single number">
-          People aren't great at guessing where they fall on a scale — and the people furthest from average tend
-          to be the most confident they're near it. One study of health habits found this pattern again and
-          again: people rated themselves as healthier than they were, and the people doing the least healthy
-          things were usually the most surprised to hear it (Miller et al., 2019). Just showing someone a
-          comparison doesn't fix this on its own, either — later research found that generic "here's the average
-          person" feedback barely changed anyone's self-assessment, and what actually helped was telling people
-          how far off guesses like theirs usually are (Fellner-Röhling et al., 2023). That's why the number above
-          is shown as a range, with a plain explanation of what it leaves out, instead of one clean figure you're
-          left to read however you'd like.
+          <p>
+            People aren't great at guessing where they fall on a scale — and the people furthest from average tend
+            to be the most confident they're near it. One study of health habits found this pattern again and
+            again: people rated themselves as healthier than they were, and the people doing the least healthy
+            things were usually the most surprised to hear it (Miller et al., 2019).
+          </p>
+          <p>
+            Just showing someone a comparison doesn't fix this on its own, either — later research found that
+            generic "here's the average person" feedback barely changed anyone's self-assessment, and what
+            actually helped was telling people how far off guesses like theirs usually are (Fellner-Röhling et
+            al., 2023). That's why the number above is shown as a range, with a plain explanation of what it
+            leaves out, instead of one clean figure you're left to read however you'd like.
+          </p>
         </AcademicNote>
 
         {/* ---------------- 02 — What's associated with this? ---------------- */}
@@ -314,17 +323,24 @@ export default function App() {
         )}
 
         <AcademicNote title="Why there's more than one chart here">
-          One chart never tells the whole story. Researchers who studied how people read charts about fairness in
-          classrooms found that a chart showing individuals draws attention to specific outliers, a chart showing
-          groups invites more careful, contextual thinking, and a single summary number can feel more certain than
-          it really is — each view teaches you something different, and none of them alone is enough (Reinholz et
-          al., 2023). That's why the next two charts sit side by side: one ranks each factor's own link to child
-          IQ, the other shows how those factors overlap with each other — something a ranked list can't tell you.
-          And interactivity by itself doesn't make any of this easier to understand, for what it's worth. In
-          controlled experiments, adding hover effects and toggles to an already-clear chart didn't improve how
-          well people reasoned about it, and sometimes made things worse. What did help was interaction that asked
-          people to guess first and then showed them the answer (Okan et al., 2015; Mosca et al., 2021). That's the
-          spirit every interactive element on this page was built with.
+          <p>
+            One chart never tells the whole story. Researchers who studied how people read charts about fairness
+            in classrooms found that a chart showing individuals draws attention to specific outliers, a chart
+            showing groups invites more careful, contextual thinking, and a single summary number can feel more
+            certain than it really is — each view teaches you something different, and none of them alone is
+            enough (Reinholz et al., 2023).
+          </p>
+          <p>
+            That's why the next two charts sit side by side: one ranks each factor's own link to child IQ, the
+            other shows how those factors overlap with each other — something a ranked list can't tell you.
+          </p>
+          <p>
+            And interactivity by itself doesn't make any of this easier to understand, for what it's worth. In
+            controlled experiments, adding hover effects and toggles to an already-clear chart didn't improve how
+            well people reasoned about it, and sometimes made things worse. What did help was interaction that
+            asked people to guess first and then showed them the answer (Okan et al., 2015; Mosca et al., 2021).
+            That's the spirit every interactive element on this page was built with.
+          </p>
         </AcademicNote>
 
         <div className="chart-grid-2">
@@ -438,13 +454,18 @@ export default function App() {
         />
 
         <AcademicNote title="What &quot;fixed&quot; actually means">
-          Calling something "fixed" doesn't mean it was always going to happen — it means it's already happened,
-          for this particular child. Researchers who mapped out how children's well-being actually gets shaped
-          found long chains of cause and effect: government funding decisions affect how long families wait for
-          services, which affects caregiver stress, which affects a child's day-to-day environment (Poon et al.,
-          2022). None of those links show up in a snapshot of one child's history. So when a factor below is
-          labeled "fixed," that's only true in the narrow sense that nothing can be done about it now — it may
-          still be exactly the kind of thing worth investing in for the next child.
+          <p>
+            Calling something "fixed" doesn't mean it was always going to happen — it means it's already happened,
+            for this particular child. Researchers who mapped out how children's well-being actually gets shaped
+            found long chains of cause and effect: government funding decisions affect how long families wait for
+            services, which affects caregiver stress, which affects a child's day-to-day environment (Poon et al.,
+            2022).
+          </p>
+          <p>
+            None of those links show up in a snapshot of one child's history. So when a factor below is labeled
+            "fixed," that's only true in the narrow sense that nothing can be done about it now — it may still be
+            exactly the kind of thing worth investing in for the next child.
+          </p>
         </AcademicNote>
 
         {correlations && (
@@ -479,15 +500,19 @@ export default function App() {
         />
 
         <AcademicNote title="Why several variables together are harder to reason about than one">
-          Looking at several variables at once is harder than it sounds, and most of us are worse at it than we'd
-          guess. Studies of how people reason about samples and evidence show that even careful, numerate readers
-          make mistakes when combining several pieces of statistical information — and those mistakes shrink the
-          more comfortable someone is with numbers to begin with (Chesney &amp; Obrecht, 2011). Separate research on
-          students working with real scientific datasets found that the people who actually understood what was
-          going on weren't the ones who could read a single chart correctly — they were the ones who could compare
-          charts against each other and connect the data back to an explanation (Resnick, Kastens, &amp; Shipley,
-          2018). The case study below tries to make that kind of comparison explicit instead of assuming you'll do
-          it in your head.
+          <p>
+            Looking at several variables at once is harder than it sounds, and most of us are worse at it than
+            we'd guess. Studies of how people reason about samples and evidence show that even careful, numerate
+            readers make mistakes when combining several pieces of statistical information — and those mistakes
+            shrink the more comfortable someone is with numbers to begin with (Chesney &amp; Obrecht, 2011).
+          </p>
+          <p>
+            Separate research on students working with real scientific datasets found that the people who
+            actually understood what was going on weren't the ones who could read a single chart correctly — they
+            were the ones who could compare charts against each other and connect the data back to an explanation
+            (Resnick, Kastens, &amp; Shipley, 2018). The case study below tries to make that kind of comparison
+            explicit instead of assuming you'll do it in your head.
+          </p>
         </AcademicNote>
 
         {regression && idealCeiling && (
@@ -502,13 +527,18 @@ export default function App() {
         )}
 
         <AcademicNote title="Why this is something to use, not just read">
-          Data is more useful when it's something you can push back on, not just something you're told. One
-          project paired population statistics with people's own stories, turning a one-way report into something
-          closer to a conversation (Rojas &amp; Ju, 2009), and other researchers have found real value in letting
-          people explore and compare data themselves rather than just handing them a finished conclusion (Heer
-          &amp; Hellerstein, 2009). That's really the point of building this page as something you interact with
-          instead of a report you read once: understanding a population's patterns is only useful if it leaves you
-          with something to do with it.
+          <p>
+            Data is more useful when it's something you can push back on, not just something you're told. One
+            project paired population statistics with people's own stories, turning a one-way report into
+            something closer to a conversation (Rojas &amp; Ju, 2009), and other researchers have found real value
+            in letting people explore and compare data themselves rather than just handing them a finished
+            conclusion (Heer &amp; Hellerstein, 2009).
+          </p>
+          <p>
+            That's really the point of building this page as something you interact with instead of a report you
+            read once: understanding a population's patterns is only useful if it leaves you with something to do
+            with it.
+          </p>
         </AcademicNote>
 
         {/* ---------------- appendix: about the dataset ---------------- */}
@@ -524,18 +554,25 @@ export default function App() {
         )}
 
         <ChartCard title="Source & methodology" subtitle="What 'synthetic' means for this specific dataset">
-          <p className="methodology-text">
-            Every row is procedurally generated — no real child or study participant is reproduced, and privacy is
-            guaranteed by construction. But the generator's parameters are calibrated to published research rather
-            than invented: the parental-midpoint–to–child-IQ correlation is set to ~0.53 (Reed &amp; Rich), childhood
-            heritability to the ~0.4 range reported by twin/adoption studies, iodine deficiency to roughly -7 to -12
-            IQ points (multiple meta-analyses), and lead exposure, prematurity, low birth weight, and breastfeeding's
-            SES-confounded effect are modeled the same way. Regression to the mean and a Flynn-effect drift by birth
-            year are built in deliberately. These sources shaped the simulator's design only — no data from them is
-            reproduced here. The dataset creator is explicit that this is an educational modeling tool, not a
-            psychological assessment or a statement about any real person or group — and deliberately excludes race
-            or ethnicity as a predictor, since framing group IQ differences as genetic has no scientific basis.
-          </p>
+          <div className="methodology-text">
+            <p>
+              Every row is procedurally generated — no real child or study participant is reproduced, and privacy
+              is guaranteed by construction. But the generator's parameters are calibrated to published research
+              rather than invented: the parental-midpoint–to–child-IQ correlation is set to ~0.53 (Reed &amp;
+              Rich), childhood heritability to the ~0.4 range reported by twin/adoption studies, iodine deficiency
+              to roughly -7 to -12 IQ points (multiple meta-analyses), and lead exposure, prematurity, low birth
+              weight, and breastfeeding's SES-confounded effect are modeled the same way.
+            </p>
+            <p>
+              Regression to the mean and a Flynn-effect drift by birth year are built in deliberately. These
+              sources shaped the simulator's design only — no data from them is reproduced here.
+            </p>
+            <p>
+              The dataset creator is explicit that this is an educational modeling tool, not a psychological
+              assessment or a statement about any real person or group — and deliberately excludes race or
+              ethnicity as a predictor, since framing group IQ differences as genetic has no scientific basis.
+            </p>
+          </div>
           <p className="methodology-source">
             Source:{" "}
             <a href="https://www.kaggle.com/datasets/sergionefedov/child-iq-genes-environment" target="_blank" rel="noreferrer">
