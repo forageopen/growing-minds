@@ -1,6 +1,13 @@
-import type { ByBinary, ByCategory, CorrelationEntry, Distributions, Overview } from "./types";
+import type { ByBinary, ByCategory, Distributions, Overview } from "./types";
 
 export type VariableStats = Record<string, { mean: number; sd: number }>;
+
+export interface ProfileRegression {
+  variables: string[];
+  betas: number[];
+  marginalR: number[];
+  modelR2: number;
+}
 
 // Every field a visitor can set to build their own profile. Deliberately
 // excludes anything nobody could plausibly know about their own childhood
@@ -40,6 +47,8 @@ export interface BinaryFieldDef {
   yesLabel: string;
   noLabel: string;
   modifiable: boolean;
+  /** which value (true/false) is associated with the higher child_iq group mean */
+  bestValue: boolean;
 }
 
 export interface NumericFieldDef {
@@ -51,6 +60,10 @@ export interface NumericFieldDef {
   step: number;
   unit?: string;
   modifiable: boolean;
+  /** true if `max` is an open-ended "or more" bucket rather than a hard ceiling */
+  openEnded?: boolean;
+  /** which end of the slider correlates with higher child_iq */
+  bestDirection: "max" | "min";
 }
 
 export const CATEGORICAL_FIELDS: CategoricalFieldDef[] = [
@@ -99,6 +112,7 @@ export const BINARY_FIELDS: BinaryFieldDef[] = [
     yesLabel: "Yes",
     noLabel: "No",
     modifiable: false,
+    bestValue: true,
   },
   {
     id: "maternal_smoking_pregnancy",
@@ -107,6 +121,7 @@ export const BINARY_FIELDS: BinaryFieldDef[] = [
     yesLabel: "Yes",
     noLabel: "No / not sure",
     modifiable: false,
+    bestValue: false,
   },
   {
     id: "alcohol_exposure",
@@ -115,6 +130,7 @@ export const BINARY_FIELDS: BinaryFieldDef[] = [
     yesLabel: "Yes",
     noLabel: "No / not sure",
     modifiable: false,
+    bestValue: false,
   },
   {
     id: "preterm",
@@ -123,6 +139,7 @@ export const BINARY_FIELDS: BinaryFieldDef[] = [
     yesLabel: "Yes",
     noLabel: "No / not sure",
     modifiable: false,
+    bestValue: false,
   },
 ];
 
@@ -132,30 +149,36 @@ export const NUMERIC_FIELDS: NumericFieldDef[] = [
     group: "family",
     question: "About how many years of education did your mother complete?",
     min: 0,
-    max: 20,
+    max: 24,
     step: 1,
     unit: " yrs",
     modifiable: false,
+    openEnded: true,
+    bestDirection: "max",
   },
   {
     id: "maternal_age_at_birth",
     group: "family",
     question: "About how old was your mother when you were born?",
     min: 15,
-    max: 45,
+    max: 50,
     step: 1,
     unit: " yrs",
     modifiable: false,
+    openEnded: true,
+    bestDirection: "max",
   },
   {
     id: "breastfed_months",
     group: "pregnancy",
     question: "About how many months were you breastfed, if known?",
     min: 0,
-    max: 24,
+    max: 60,
     step: 1,
     unit: " mo",
     modifiable: false,
+    openEnded: true,
+    bestDirection: "max",
   },
   {
     id: "home_stimulation_score",
@@ -165,25 +188,30 @@ export const NUMERIC_FIELDS: NumericFieldDef[] = [
     max: 100,
     step: 5,
     modifiable: true,
+    bestDirection: "max",
   },
   {
     id: "books_in_home",
     group: "environment",
     question: "About how many books were in your home growing up?",
     min: 0,
-    max: 300,
+    max: 500,
     step: 10,
     modifiable: true,
+    openEnded: true,
+    bestDirection: "max",
   },
   {
     id: "screen_hours_daily",
     group: "environment",
     question: "About how many hours of screen time did you have per day?",
     min: 0,
-    max: 8,
+    max: 12,
     step: 0.5,
     unit: " hrs",
     modifiable: true,
+    openEnded: true,
+    bestDirection: "min",
   },
   {
     id: "nutrition_quality",
@@ -193,6 +221,7 @@ export const NUMERIC_FIELDS: NumericFieldDef[] = [
     max: 10,
     step: 1,
     modifiable: true,
+    bestDirection: "max",
   },
   {
     id: "adverse_childhood_experiences",
@@ -202,8 +231,28 @@ export const NUMERIC_FIELDS: NumericFieldDef[] = [
     max: 10,
     step: 1,
     modifiable: true,
+    bestDirection: "min",
   },
 ];
+
+/** The best possible profile within this tool's own field set — used only to
+ * demonstrate, transparently, the index's ceiling given which variables it
+ * was built to ask about. */
+export function buildIdealProfile(): Profile {
+  const categorical: Profile["categorical"] = {};
+  for (const field of CATEGORICAL_FIELDS) {
+    categorical[field.id] = field.options[field.options.length - 1].value;
+  }
+  const binary: Profile["binary"] = {};
+  for (const field of BINARY_FIELDS) {
+    binary[field.id] = field.bestValue;
+  }
+  const numeric: Profile["numeric"] = {};
+  for (const field of NUMERIC_FIELDS) {
+    numeric[field.id] = field.bestDirection === "max" ? field.max : field.min;
+  }
+  return { categorical, binary, numeric };
+}
 
 export const GROUP_LABELS: Record<CategoricalFieldDef["group"], string> = {
   family: "Family background",
@@ -219,22 +268,36 @@ interface ScoreInputs {
   overview: Overview;
   byCategory: ByCategory;
   byBinary: ByBinary;
-  correlations: CorrelationEntry[];
   variableStats: VariableStats;
+  regression: ProfileRegression;
 }
 
 export interface ScoreResult {
   score: number;
-  percentile: number;
+  band: [number, number];
   contributions: { label: string; delta: number }[];
 }
 
-function correlationFor(correlations: CorrelationEntry[], column: string): number {
-  return correlations.find((c) => c.column === column)?.r ?? 0;
-}
-
+/**
+ * The composite index used to sum each numeric field's *marginal* correlation
+ * with child_iq independently. That double-counts shared variance between
+ * correlated predictors (maternal education, home stimulation, and nutrition
+ * all partly track the same underlying SES) — the more fields a visitor
+ * filled in, the more that overlap got counted twice.
+ *
+ * Fixed: numeric fields now use standardized multiple-regression coefficients
+ * (solved from the predictor correlation matrix — see build-data.mjs) instead
+ * of raw correlations, which properly holds the other selected factors
+ * constant. Measured on this dataset, that correction is conservative, not
+ * generous: naive sum-of-r² overstated the true multiple-R² by about 38%.
+ *
+ * This index still excludes parental IQ and other unmeasured traits — the
+ * strongest individual predictors in the dataset — by design, so it will
+ * rarely approach the extremes a real psychometric test can reach. It
+ * reflects environmental/SES associations only, never a personal estimate.
+ */
 export function computeScore(profile: Profile, inputs: ScoreInputs): ScoreResult {
-  const { overview, byCategory, byBinary, correlations, variableStats } = inputs;
+  const { overview, byCategory, byBinary, variableStats, regression } = inputs;
   const popMean = overview.iq.mean;
   const popSd = overview.iq.sd;
   const contributions: { label: string; delta: number }[] = [];
@@ -263,17 +326,23 @@ export function computeScore(profile: Profile, inputs: ScoreInputs): ScoreResult
   for (const field of NUMERIC_FIELDS) {
     const value = profile.numeric[field.id];
     const varStats = variableStats[field.id];
-    if (value === undefined || !varStats || varStats.sd === 0) continue;
-    const r = correlationFor(correlations, field.id);
+    const betaIdx = regression.variables.indexOf(field.id);
+    if (value === undefined || !varStats || varStats.sd === 0 || betaIdx === -1) continue;
+    const beta = regression.betas[betaIdx];
     const z = (value - varStats.mean) / varStats.sd;
-    const delta = z * r * popSd;
+    const delta = z * beta * popSd;
     score += delta;
     contributions.push({ label: field.question, delta });
   }
 
   contributions.sort((a, b) => Math.abs(b.delta) - Math.abs(a.delta));
 
-  return { score, percentile: 50, contributions };
+  // A fixed, honest uncertainty band rather than false precision: this
+  // dataset's substantial random component (and everything the profile
+  // doesn't ask about) dwarfs the selected factors' combined effect.
+  const band: [number, number] = [score - 0.5 * popSd, score + 0.5 * popSd];
+
+  return { score, band, contributions };
 }
 
 export function percentileFromDistribution(value: number, bins: Distributions["child_iq"]): number {

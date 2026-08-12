@@ -252,6 +252,53 @@ for (const col of PROFILE_NUMERIC_VARS) {
   variableStats[col] = { mean: +mean(vals).toFixed(3), sd: +stddev(vals).toFixed(3) };
 }
 
+// --- profile engine: standardized multiple-regression coefficients --------
+// The profile builder's composite index used to sum each field's *marginal*
+// correlation with child_iq independently. That double-counts shared
+// variance between correlated predictors (e.g. maternal education and home
+// stimulation both partly track SES) — the more fields a visitor filled in,
+// the more that overlap got counted twice. The fix: solve the standardized
+// normal equations R_xx * beta = r_xy, where R_xx is the predictor-predictor
+// correlation matrix and r_xy is each predictor's correlation with child_iq.
+// beta_i is then "this predictor's own contribution, holding the others
+// fixed" — the standard multiple-regression correction for multicollinearity.
+function invertMatrix(mat) {
+  const n = mat.length;
+  const aug = mat.map((row, i) => [...row, ...Array.from({ length: n }, (_, j) => (i === j ? 1 : 0))]);
+  for (let col = 0; col < n; col++) {
+    let pivotRow = col;
+    for (let r = col + 1; r < n; r++) if (Math.abs(aug[r][col]) > Math.abs(aug[pivotRow][col])) pivotRow = r;
+    [aug[col], aug[pivotRow]] = [aug[pivotRow], aug[col]];
+    const pivot = aug[col][col] || 1e-9;
+    for (let j = 0; j < 2 * n; j++) aug[col][j] /= pivot;
+    for (let r = 0; r < n; r++) {
+      if (r === col) continue;
+      const factor = aug[r][col];
+      for (let j = 0; j < 2 * n; j++) aug[r][j] -= factor * aug[col][j];
+    }
+  }
+  return aug.map((row) => row.slice(n));
+}
+
+const regressionVars = PROFILE_NUMERIC_VARS;
+const Rxx = regressionVars.map((rowVar) =>
+  regressionVars.map((colVar) => (rowVar === colVar ? 1 : pearson(rows.map((r) => r[rowVar]), rows.map((r) => r[colVar]))))
+);
+const rxy = regressionVars.map((v) => pearson(rows.map((r) => r[v]), iq));
+const RxxInv = invertMatrix(Rxx);
+const betas = RxxInv.map((row) => row.reduce((sum, v, i) => sum + v * rxy[i], 0));
+const modelR2 = betas.reduce((sum, b, i) => sum + b * rxy[i], 0);
+
+const profileRegressionBetas = {
+  variables: regressionVars,
+  betas: betas.map((b) => +b.toFixed(4)),
+  marginalR: rxy.map((r) => +r.toFixed(4)),
+  modelR2: +modelR2.toFixed(4),
+};
+console.log(
+  `Profile engine: multiple-R² = ${modelR2.toFixed(3)} (vs. naive sum-of-r² = ${rxy.reduce((s, r) => s + r * r, 0).toFixed(3)})`
+);
+
 writeFileSync(path.join(PUBLIC_DATA_DIR, "overview.json"), JSON.stringify(overview));
 writeFileSync(path.join(PUBLIC_DATA_DIR, "distributions.json"), JSON.stringify(distributions));
 writeFileSync(path.join(PUBLIC_DATA_DIR, "flynn_effect.json"), JSON.stringify(flynnEffect));
@@ -262,6 +309,7 @@ writeFileSync(path.join(PUBLIC_DATA_DIR, "correlation_matrix.json"), JSON.string
 writeFileSync(path.join(PUBLIC_DATA_DIR, "scatter_sample.json"), JSON.stringify(scatterSample));
 writeFileSync(path.join(PUBLIC_DATA_DIR, "dictionary.json"), JSON.stringify(dictionary));
 writeFileSync(path.join(PUBLIC_DATA_DIR, "variable_stats.json"), JSON.stringify(variableStats));
+writeFileSync(path.join(PUBLIC_DATA_DIR, "profile_regression.json"), JSON.stringify(profileRegressionBetas));
 writeFileSync(path.join(PUBLIC_DATA_DIR, "validation.json"), JSON.stringify(validation));
 
 console.log("Wrote processed data to", PROCESSED_DIR);

@@ -24,21 +24,9 @@ export function CorrelationHeatmap({ variables, values, labels }: Props) {
   const W = M.left + M.right + n * CELL;
   const H = M.top + M.bottom + n * CELL + 90;
 
-  const matrixSize = n * CELL;
-
   return (
     <div className="chart-wrap">
       <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-label="Correlation matrix among numeric predictors and child IQ">
-        <defs>
-          <clipPath id="heatmap-clip">
-            <rect x={0} y={0} width={matrixSize} height={matrixSize} rx={4} />
-          </clipPath>
-          <linearGradient id="heatmap-shimmer-gradient" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0%" stopColor="var(--abd-text-primary)" stopOpacity={0} />
-            <stop offset="50%" stopColor="var(--abd-text-primary)" stopOpacity={0.16} />
-            <stop offset="100%" stopColor="var(--abd-text-primary)" stopOpacity={0} />
-          </linearGradient>
-        </defs>
         <g transform={`translate(${M.left}, ${M.top + 90})`}>
           {variables.map((rowVar, ri) => (
             <text key={rowVar} x={-10} y={ri * CELL + CELL / 2} textAnchor="end" dominantBaseline="middle" className="lollipop-label">
@@ -59,7 +47,13 @@ export function CorrelationHeatmap({ variables, values, labels }: Props) {
             row.map((v, ci) => {
               const isHover = hover?.[0] === ri && hover?.[1] === ci;
               return (
-                <g key={`${ri}-${ci}`} onMouseEnter={() => setHover([ri, ci])} onMouseLeave={() => setHover(null)}>
+                <g
+                  key={`${ri}-${ci}`}
+                  className={reducedMotion ? undefined : "mosaic-cell"}
+                  style={reducedMotion ? undefined : { animationDelay: `${(ri + ci) * 0.07}s` }}
+                  onMouseEnter={() => setHover([ri, ci])}
+                  onMouseLeave={() => setHover(null)}
+                >
                   <rect
                     x={ci * CELL + 2}
                     y={ri * CELL + 2}
@@ -85,20 +79,6 @@ export function CorrelationHeatmap({ variables, values, labels }: Props) {
               );
             })
           )}
-          <g clipPath="url(#heatmap-clip)" style={{ pointerEvents: "none" }}>
-            <rect x={0} y={-matrixSize * 0.3} width={matrixSize * 0.5} height={matrixSize * 1.6} fill="url(#heatmap-shimmer-gradient)" transform="skewX(-20)">
-              {!reducedMotion && (
-                <animateTransform
-                  attributeName="transform"
-                  type="translate"
-                  values={`${-matrixSize};${matrixSize * 1.3}`}
-                  dur="4.2s"
-                  repeatCount="indefinite"
-                  additive="sum"
-                />
-              )}
-            </rect>
-          </g>
         </g>
       </svg>
       {hover && (

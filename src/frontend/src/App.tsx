@@ -3,10 +3,12 @@ import { Baby, Github, Users, Brain, TrendingUp, ShieldCheck } from "lucide-reac
 import { useJson } from "./lib/useJson";
 import { COLUMN_LABELS, CATEGORY_ORDERS, prettyKey } from "./lib/labels";
 import {
+  buildIdealProfile,
   computeScore,
   emptyProfile,
   percentileFromDistribution,
   type Profile,
+  type ProfileRegression,
   type VariableStats,
 } from "./lib/profile";
 import type {
@@ -30,6 +32,9 @@ import { DisclaimerCallout } from "./components/DisclaimerCallout";
 import { ProfileBuilder } from "./components/ProfileBuilder";
 import { PositionSummary } from "./components/PositionSummary";
 import { FactorSplit } from "./components/FactorSplit";
+import { Primer } from "./components/Primer";
+import { InfoTip } from "./components/InfoTip";
+import { VariableSelectionCaseStudy } from "./components/VariableSelectionCaseStudy";
 
 import { CausalFlowChart } from "./charts/CausalFlowChart";
 import { FlynnEffectChart } from "./charts/FlynnEffectChart";
@@ -74,6 +79,7 @@ export default function App() {
   const dictionary = useJson<DictionaryEntry[]>("dictionary.json");
   const validation = useJson<ValidationReport>("validation.json");
   const variableStats = useJson<VariableStats>("variable_stats.json");
+  const regression = useJson<ProfileRegression>("profile_regression.json");
 
   const [profile, setProfile] = useState<Profile>(emptyProfile());
   const [categoryVar, setCategoryVar] = useState<(typeof CATEGORY_VARS)[number]>("household_income_bracket");
@@ -82,14 +88,32 @@ export default function App() {
   const profileHasSelection = hasSelection(profile);
 
   const scoreResult = useMemo(() => {
-    if (!overview || !byCategory || !byBinary || !correlations || !variableStats) return null;
-    return computeScore(profile, { overview, byCategory, byBinary, correlations, variableStats });
-  }, [profile, overview, byCategory, byBinary, correlations, variableStats]);
+    if (!overview || !byCategory || !byBinary || !variableStats || !regression) return null;
+    return computeScore(profile, { overview, byCategory, byBinary, variableStats, regression });
+  }, [profile, overview, byCategory, byBinary, variableStats, regression]);
 
   const percentile = useMemo(() => {
     if (!scoreResult || !distributions) return 50;
     return percentileFromDistribution(scoreResult.score, distributions.child_iq);
   }, [scoreResult, distributions]);
+
+  const percentileBand = useMemo((): [number, number] => {
+    if (!scoreResult || !distributions) return [50, 50];
+    return [
+      percentileFromDistribution(scoreResult.band[0], distributions.child_iq),
+      percentileFromDistribution(scoreResult.band[1], distributions.child_iq),
+    ];
+  }, [scoreResult, distributions]);
+
+  // Computed live (not hardcoded) so the "Why variable selection matters"
+  // case study always reflects the current engine, not a stale test result.
+  const idealCeiling = useMemo(() => {
+    if (!overview || !byCategory || !byBinary || !variableStats || !regression || !distributions) return null;
+    const result = computeScore(buildIdealProfile(), { overview, byCategory, byBinary, variableStats, regression });
+    return { score: result.score, percentile: percentileFromDistribution(result.score, distributions.child_iq) };
+  }, [overview, byCategory, byBinary, variableStats, regression, distributions]);
+
+  const naiveR2 = regression ? regression.marginalR.reduce((sum, r) => sum + r * r, 0) : 0;
 
   const dumbbellRows: DumbbellRow[] = byBinary
     ? BINARY_FACTORS.map(({ key, label }) => {
@@ -148,6 +172,8 @@ export default function App() {
           enter here is stored, sent anywhere, or used for anything beyond this page.
         </DisclaimerCallout>
 
+        <Primer />
+
         {/* ---------------- 01 — Where do I sit? ---------------- */}
         <SectionHeader
           number="01"
@@ -163,12 +189,27 @@ export default function App() {
           <ChartCard
             title={profileHasSelection ? "Where this profile sits" : "Where the population sits"}
             subtitle="A transparent index built from group averages for the factors you selected — not a prediction"
+            explainer={
+              <>
+                <p>
+                  The big number is a <strong>composite index</strong>: start at the population average, then add
+                  or subtract each factor's known effect for the options you picked. It is not a real IQ score and
+                  was never run through any test — it only reflects the handful of factors you selected.
+                </p>
+                <p>
+                  It's shown as a range rather than one number because a single figure would claim more precision
+                  than the underlying data supports — see "Why variable selection matters" near the bottom of the
+                  page for exactly how much this index can and can't claim.
+                </p>
+              </>
+            }
           >
             {scoreResult && (
               <PositionSummary
                 hasAnySelection={profileHasSelection}
                 score={scoreResult.score}
                 percentile={percentile}
+                percentileBand={percentileBand}
                 contributions={scoreResult.contributions}
               />
             )}
@@ -177,6 +218,7 @@ export default function App() {
                 <DensityChart
                   bins={distributions.child_iq}
                   markerValue={scoreResult.score}
+                  markerBand={scoreResult.band}
                   markerLabel={profileHasSelection ? "You" : "Average"}
                 />
               </div>
@@ -196,6 +238,14 @@ export default function App() {
             title="How the factors flow into child IQ"
             subtitle="A causal pathway from starting conditions to measured outcome — particles trace the flow continuously"
             footnote="Sublabels are computed from this dataset: Pearson r vs. child IQ, or the mean-IQ gap for preterm birth."
+            explainer={
+              <p>
+                The arrows show a plausible <em>order</em> — genetics and SES come first, then prenatal exposure,
+                then early environment, then the measured outcome. They are not proof that one box causes the
+                next: the sublabels are <InfoTip term="r" /> correlations and group-mean gaps, and neither one
+                establishes causation on its own.
+              </p>
+            }
           >
             <CausalFlowChart
               subtitles={{
@@ -223,6 +273,14 @@ export default function App() {
           <ChartCard
             title="The Flynn effect"
             subtitle="Mean child IQ by birth year — the generational rise (and plateau) in measured IQ, ±1 SD band"
+            explainer={
+              <p>
+                Each dot is the average IQ of children born that year; the shaded band is ±1{" "}
+                <InfoTip term="sd" /> — the range covering roughly two-thirds of children born that year. A rising
+                line describes the population, not individuals — it doesn't mean any specific child is "getting
+                smarter."
+              </p>
+            }
           >
             <FlynnEffectChart data={flynnEffect} />
           </ChartCard>
@@ -233,6 +291,14 @@ export default function App() {
             <ChartCard
               title="Strongest predictors of child IQ"
               subtitle="Pearson correlation of each factor with child IQ — dot position and color encode direction and strength"
+              explainer={
+                <p>
+                  Each row is one variable's <InfoTip term="r" /> with child IQ. Distance from the center line is
+                  strength; color is direction. This ranks by strength alone — a strong correlation here doesn't
+                  mean a strong real-world effect, and it isn't causation (<InfoTip term="causation" />
+                  ).
+                </p>
+              }
             >
               <LollipopChart data={correlations} labels={COLUMN_LABELS} />
             </ChartCard>
@@ -242,6 +308,14 @@ export default function App() {
             <ChartCard
               title="How predictors relate to each other"
               subtitle="Pairwise correlation matrix across key numeric factors"
+              explainer={
+                <p>
+                  Every cell is the <InfoTip term="r" /> between its row and column variable — including pairs that
+                  don't involve child IQ at all. This is what tells you when two predictors overlap, which is
+                  exactly the problem the profile-builder engine (see "Why variable selection matters" below) had
+                  to correct for.
+                </p>
+              }
             >
               <CorrelationHeatmap variables={correlationMatrix.variables} values={correlationMatrix.values} labels={COLUMN_LABELS} />
             </ChartCard>
@@ -252,6 +326,12 @@ export default function App() {
           <ChartCard
             title="Category effects on IQ"
             subtitle="Group mean IQ vs. the population mean — your selection (if any) is marked"
+            explainer={
+              <p>
+                Each dot is one group's average child IQ; the dashed line is the population average. Distance from
+                the line is the group's gap in IQ points — a plain difference, not a percentage or a probability.
+              </p>
+            }
             actions={
               <select value={categoryVar} onChange={(e) => setCategoryVar(e.target.value as typeof categoryVar)} className="select-input">
                 {CATEGORY_VARS.map((v) => (
@@ -274,6 +354,13 @@ export default function App() {
           <ChartCard
             title="Risk-factor gaps"
             subtitle="Mean child IQ with vs. without each exposure — the line length is the effect size"
+            explainer={
+              <p>
+                Two dots connected by a line: one for children without the factor, one for children with it. The
+                line's length is the <InfoTip term="effectSize" /> in IQ points — often a more honest number to
+                look at than a correlation alone, since it's in the outcome's real units.
+              </p>
+            }
           >
             <DumbbellChart rows={dumbbellRows} presentLabel="present" absentLabel="absent" />
           </ChartCard>
@@ -283,6 +370,13 @@ export default function App() {
           <ChartCard
             title="Parent IQ &amp; home environment vs. child IQ"
             subtitle="1,500-child sample with marginal distributions on each axis and a fitted trend line"
+            explainer={
+              <p>
+                Each dot is one sampled child. The strips on top and right show each variable's distribution on
+                its own (a <InfoTip term="density" />-style view); the dashed line is the best straight-line fit.
+                A trend line describes the overall pattern — it says nothing about what happens for any one child.
+              </p>
+            }
             actions={
               <select value={scatterVar} onChange={(e) => setScatterVar(e.target.value as typeof scatterVar)} className="select-input">
                 {SCATTER_VARS.map((v) => (
@@ -306,6 +400,14 @@ export default function App() {
           <ChartCard
             title="Fixed history vs. shapeable environment"
             subtitle="Same dataset, split by whether a caregiver could still influence the factor today"
+            explainer={
+              <p>
+                The r values here are raw <InfoTip term="r" /> with child IQ for each variable on its own — not
+                the corrected coefficients the profile-builder engine uses internally (see below). They're kept
+                as plain correlations here because the point of this chart is ranking factors by their own
+                association, not combining them into one number.
+              </p>
+            }
           >
             <FactorSplit correlations={correlations} />
           </ChartCard>
@@ -317,6 +419,24 @@ export default function App() {
           this as an illustration of how developmental research findings tend to look in aggregate, not as
           guidance for any individual child or family.
         </DisclaimerCallout>
+
+        {/* ---------------- variable-selection case study ---------------- */}
+        <SectionHeader
+          number="—"
+          title="Why variable selection matters"
+          lede="Two real decisions from building this page, and what each one cost — for anyone setting up their own analysis."
+        />
+
+        {regression && idealCeiling && (
+          <ChartCard title="A case study in this project's own data" subtitle="Computed live from the current engine, not a fixed writeup">
+            <VariableSelectionCaseStudy
+              naiveR2={naiveR2}
+              correctedR2={regression.modelR2}
+              idealScore={idealCeiling.score}
+              idealPercentile={idealCeiling.percentile}
+            />
+          </ChartCard>
+        )}
 
         {/* ---------------- appendix: about the dataset ---------------- */}
         <SectionHeader number="—" title="About this dataset" lede="For the curious: methodology, validation, and the full column reference." />

@@ -10,6 +10,7 @@ interface Props {
   color?: string;
   unit?: string;
   markerValue?: number;
+  markerBand?: [number, number];
   markerLabel?: string;
 }
 
@@ -17,7 +18,7 @@ const W = 640;
 const H = 220;
 const M = { top: 30, right: 16, bottom: 28, left: 16 };
 
-export function DensityChart({ bins, color = "var(--series-1)", unit = "", markerValue, markerLabel }: Props) {
+export function DensityChart({ bins, color = "var(--series-1)", unit = "", markerValue, markerBand, markerLabel }: Props) {
   const [hoverX, setHoverX] = useState<number | null>(null);
   const reducedMotion = useReducedMotion();
   const pathId = `density-comet-${useId().replace(/[^a-zA-Z0-9]/g, "")}`;
@@ -71,6 +72,17 @@ export function DensityChart({ bins, color = "var(--series-1)", unit = "", marke
 
         {nearest && (
           <line x1={x(nearest.x)} x2={x(nearest.x)} y1={M.top} y2={H - M.bottom} className="crosshair" />
+        )}
+
+        {markerBand && (
+          <rect
+            x={x(markerBand[0])}
+            y={M.top - 14}
+            width={Math.max(0, x(markerBand[1]) - x(markerBand[0]))}
+            height={H - M.bottom - (M.top - 14)}
+            fill="var(--marker-you)"
+            opacity={0.12}
+          />
         )}
 
         {markerValue !== undefined && (

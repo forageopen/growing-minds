@@ -1,0 +1,1 @@
+{"variables":["maternal_education_years","maternal_age_at_birth","home_stimulation_score","books_in_home","screen_hours_daily","nutrition_quality","adverse_childhood_experiences","breastfed_months"],"betas":[0.2224,0.0049,0.2065,0.1223,-0.084,0.1354,-0.1611,0.0412],"marginalR":[0.2994,-0.0001,0.2853,0.1769,-0.1138,0.1954,-0.221,0.0406],"modelR2":0.2204}

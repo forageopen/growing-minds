@@ -87,6 +87,7 @@ export function ProfileBuilder({ profile, onChange, onReset }: Props) {
                       <span className="profile-field-value">
                         {value}
                         {field.unit ?? ""}
+                        {field.openEnded && value >= field.max ? "+" : ""}
                       </span>
                     )}
                   </label>

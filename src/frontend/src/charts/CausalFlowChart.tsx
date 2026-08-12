@@ -97,6 +97,9 @@ export function CausalFlowChart({ subtitles }: Props) {
           <marker id="flow-arrowhead" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
             <path d="M0,0 L10,5 L0,10 Z" fill="var(--abd-border)" />
           </marker>
+          <filter id="flow-glow" x="-60%" y="-60%" width="220%" height="220%">
+            <feGaussianBlur stdDeviation="9" />
+          </filter>
         </defs>
 
         {!reducedMotion && (
@@ -118,53 +121,84 @@ export function CausalFlowChart({ subtitles }: Props) {
         <path id="flow-main-path" d={mainD} fill="none" stroke="none" />
         <path id="flow-branch-path" d={branchD} fill="none" stroke="none" />
 
-        {nodes.map((n) => (
-          <g key={n.id}>
-            {!reducedMotion && (
-              <circle
-                cx={n.cx}
-                cy={n.cy}
-                r={NODE_H / 2}
-                fill="none"
+        {nodes.map((n) => {
+          const cycleDur = n.id === "D" ? BRANCH_DUR : MAIN_DUR;
+          const begin = `${arrival[n.id]}s`;
+          return (
+            <g key={n.id}>
+              {!reducedMotion && (
+                <>
+                  {/* soft blurred glow flash — the "touchpoint lights up" moment */}
+                  <rect
+                    x={n.cx - NODE_W / 2}
+                    y={n.cy - NODE_H / 2}
+                    width={NODE_W}
+                    height={NODE_H}
+                    rx={10}
+                    fill={n.color}
+                    filter="url(#flow-glow)"
+                    opacity={0}
+                  >
+                    <animate
+                      attributeName="opacity"
+                      values="0;0.9;0.2;0;0"
+                      keyTimes="0;0.05;0.13;0.22;1"
+                      dur={`${cycleDur}s`}
+                      begin={begin}
+                      repeatCount="indefinite"
+                    />
+                  </rect>
+                  {/* expanding ring */}
+                  <circle cx={n.cx} cy={n.cy} r={NODE_H / 2} fill="none" stroke={n.color} strokeWidth={2} opacity={0}>
+                    <animate
+                      attributeName="r"
+                      values={`${NODE_H / 2};${NODE_H / 2 + 24};${NODE_H / 2 + 24}`}
+                      keyTimes="0;0.22;1"
+                      dur={`${cycleDur}s`}
+                      begin={begin}
+                      repeatCount="indefinite"
+                    />
+                    <animate
+                      attributeName="opacity"
+                      values="0.7;0;0"
+                      keyTimes="0;0.22;1"
+                      dur={`${cycleDur}s`}
+                      begin={begin}
+                      repeatCount="indefinite"
+                    />
+                  </circle>
+                </>
+              )}
+              <rect
+                x={n.cx - NODE_W / 2}
+                y={n.cy - NODE_H / 2}
+                width={NODE_W}
+                height={NODE_H}
+                rx={10}
+                fill="var(--abd-surface)"
                 stroke={n.color}
-                strokeWidth={2}
-                opacity={0}
-                className="node-pulse"
+                strokeWidth={1.75}
               >
-                <animate
-                  attributeName="r"
-                  values={`${NODE_H / 2};${NODE_H / 2 + 20}`}
-                  dur={`${n.id === "D" ? BRANCH_DUR : MAIN_DUR}s`}
-                  begin={`${arrival[n.id]}s`}
-                  repeatCount="indefinite"
-                />
-                <animate
-                  attributeName="opacity"
-                  values="0.55;0"
-                  dur={`${n.id === "D" ? BRANCH_DUR : MAIN_DUR}s`}
-                  begin={`${arrival[n.id]}s`}
-                  repeatCount="indefinite"
-                />
-              </circle>
-            )}
-            <rect
-              x={n.cx - NODE_W / 2}
-              y={n.cy - NODE_H / 2}
-              width={NODE_W}
-              height={NODE_H}
-              rx={10}
-              fill="var(--abd-surface)"
-              stroke={n.color}
-              strokeWidth={1.75}
-            />
-            <text x={n.cx} y={n.cy - 8} textAnchor="middle" className="flow-node-label">
-              {n.label}
-            </text>
-            <text x={n.cx} y={n.cy + 12} textAnchor="middle" className="flow-node-sublabel" fill={n.color}>
-              {n.sublabel}
-            </text>
-          </g>
-        ))}
+                {!reducedMotion && (
+                  <animate
+                    attributeName="stroke-width"
+                    values="1.75;3.5;1.75;1.75"
+                    keyTimes="0;0.06;0.16;1"
+                    dur={`${cycleDur}s`}
+                    begin={begin}
+                    repeatCount="indefinite"
+                  />
+                )}
+              </rect>
+              <text x={n.cx} y={n.cy - 8} textAnchor="middle" className="flow-node-label">
+                {n.label}
+              </text>
+              <text x={n.cx} y={n.cy + 12} textAnchor="middle" className="flow-node-sublabel" fill={n.color}>
+                {n.sublabel}
+              </text>
+            </g>
+          );
+        })}
       </svg>
     </div>
   );
