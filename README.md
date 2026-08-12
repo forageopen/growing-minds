@@ -77,16 +77,6 @@ palette, validated for CVD-safe adjacency and contrast against both light and
 dark chart surfaces. Icons from [Lucide](https://lucide.dev). Light/dark theme
 follows the OS setting with a manual toggle.
 
-### Run locally
-
-```bash
-cd src/frontend
-npm install
-npm run dev       # http://localhost:4174
-npm run build      # production build to dist/
-npm run preview    # serve the production build on :4174
-```
-
 ## License
 
 Code: MIT, see `LICENSE`. Dataset: synthetic, released by its author on
