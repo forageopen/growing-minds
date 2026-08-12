@@ -15,8 +15,9 @@ depends_on:
 source_files:
   - "Full session transcript, growing-minds repo (github.com/forageopen/growing-minds)"
 compiled: 2026-08-13
+revised: 2026-08-13
 author_role: AI pair-programmer (Claude), acting under the Product Owner's direction per PRODUCT-DECISIONS.md
-scope: "Single continuous build session, initial dashboard scaffold through the Phase 0 content/animation/scoring-accuracy pass"
+scope: "Single continuous build session, initial dashboard scaffold through a post-push polish pass (paragraph readability, two SVG viewBox-clipping fixes)"
 ---
 
 # Retrospective: Building Growing Minds — Index
@@ -59,14 +60,18 @@ Initial build (dataset cleaning, GitHub repo, dashboard, Atlassian skin)
   → profile-scoring accuracy fix (naive-sum → multiple regression)
   → z-score extrapolation fix (slider widening + clamp)
   → README brought current, retrospective doc set (this)
+  → post-push polish: cropped axis-label fix, long-paragraph readability
+    pass (site-wide), cropped causal-flow node fix — each its own
+    real-world report, each fixed and pushed the same way as everything
+    before it
 ```
 
 ## Headline numbers
 
 - **Session span:** 2026-08-12 20:04 – 2026-08-13 00:17, one continuous sitting, per `git log`.
-- **Commits:** 14, `8126707` (initial dashboard) through `73b1b2d` (README update).
+- **Commits:** 18, `8126707` (initial dashboard) through `634f3bf` (causal-flow node crop fix).
 - **Automated tests:** 0 — this project has no unit-test harness; `tsc -b`, `vite build`, and `eslint` are the only automated checks. See `RETROSPECTIVE-PROCESS-AND-COLLABORATION.md` for what that meant for how bugs actually got caught.
-- **Real bugs found and fixed:** 7, cataloged in full in `RETROSPECTIVE-BUGS-AND-ROOT-CAUSES.md` — none caught by an automated check; all caught by a real number, a real report, or a real browser render contradicting what the code appeared to do.
+- **Real bugs found and fixed:** 9, cataloged in full in `RETROSPECTIVE-BUGS-AND-ROOT-CAUSES.md` — none caught by an automated check; all caught by a real number, a real report, or a real browser render contradicting what the code appeared to do. The last two (both SVG viewBox-clipping) were found after the retrospective's initial compile and appended in place, per that doc's own `revised` note.
 - **ADRs recorded:** 9, in `docs/product/PRODUCT-DECISIONS.md` Part II.
 - **Charts:** 8 hand-rolled SVG components, no charting library.
 - **Real, cited sources:** 14, linked exclusively via `doi.org`; 0 sci-hub links published.
@@ -75,3 +80,5 @@ Initial build (dataset cleaning, GitHub repo, dashboard, Atlassian skin)
 ## The single biggest recurring lesson
 
 Every real bug this session was found by a human — or a deliberately-invoked real check — noticing that something *looked wrong in the world*, never by an automated assertion, because this project has none. A profile score that didn't match a real IQ. A heatmap that visibly hid its own cells. A ceiling number that was implausibly high. A blank white page. A disclaimer sentence that undersold a checkable fact. In every one of these cases, "the build succeeded" and "the code has no type error" were both true at the exact moment the bug was live. The actionable version of this lesson, worked out in full in `RETROSPECTIVE-PROCESS-AND-COLLABORATION.md` and `RETROSPECTIVE-ABIM-PROCESS-MAPPING.md` §4: **in a project with no automated test suite, treating a suspicious real-world number or a visibly-wrong render as evidence to investigate — rather than as noise to explain away — is the actual verification mechanism this project has. There is no other one.**
+
+**Reinforced after this doc's initial compile:** the two bugs appended to `RETROSPECTIVE-BUGS-AND-ROOT-CAUSES.md` afterward (a cropped axis label, a cropped diagram node — both SVG content silently clipped by its own `viewBox` boundary) are the same lesson again, in a third form: neither threw an error, neither failed a build, and both were only found by looking at the actual rendered page.

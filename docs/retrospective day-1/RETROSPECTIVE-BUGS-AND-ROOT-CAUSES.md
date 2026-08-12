@@ -11,9 +11,16 @@ skip_when: never — this is the highest-value doc in the retrospective set
 depends_on:
   - RETROSPECTIVE-INDEX.md
 source_files:
-  - "src/frontend/vite.config.ts, src/frontend/src/styles/app.css, src/frontend/src/lib/profile.ts, scripts/build-data.mjs, README.md"
+  - "src/frontend/vite.config.ts, src/frontend/src/styles/app.css, src/frontend/src/lib/profile.ts, scripts/build-data.mjs, README.md, src/frontend/src/charts/DotPlotChart.tsx, src/frontend/src/charts/CausalFlowChart.tsx, src/frontend/src/components/AcademicNote.tsx"
 compiled: 2026-08-13
+revised: 2026-08-13
 author_role: AI pair-programmer (Claude)
+integrity: >
+  The final two entries were appended after this doc's initial compile,
+  in the same continuous session, once new real bugs surfaced — the same
+  addendum pattern used elsewhere in this Product Owner's governing docs
+  (e.g. PRODUCT-PRINCIPLES.md Part I §19/§20 in the shared template):
+  appended, dated, not silently folded into the original entries.
 ---
 
 # Retrospective: Bugs and Root Causes
@@ -86,3 +93,21 @@ Each entry follows the same five fields on purpose — consistent structure over
 - **Root Cause:** The original copy was written cautiously to avoid overclaiming realism, but in doing so undersold a claim that was actually verifiable and true — the Kaggle dataset page itself states the specific calibration targets (parental-midpoint correlation ~0.53, heritability ~0.4, iodine deficiency −7 to −12 IQ points, etc.).
 - **Fix:** Verified the claim directly against the actual Kaggle dataset page (not assumed), then rewrote the disclaimer to state plainly that the generator's parameters are calibrated to published research while still being explicit that no data from that research, and no real child, is reproduced — both halves of the claim stated accurately instead of one being flattened for caution.
 - **Lesson:** "Write conservatively to avoid overclaiming" and "state the actual, checkable facts accurately" are not automatically the same thing — a disclaimer can undersell a true, verifiable claim just as easily as it can oversell a false one, and both are inaccuracies worth fixing. The fix required going back to the primary source (the dataset's own page) rather than editing the sentence based on general caution.
+
+## SVG geometry silently clipped by its own viewBox boundary (recurred 2×)
+
+- **Problem, first occurrence:** The "pop. mean 100" axis label above the category-comparison charts (`DotPlotChart.tsx`) rendered with its top edge visibly cropped.
+- **Problem, second occurrence:** The rightmost node of the causal-flow diagram ("Cognitive potential," `CausalFlowChart.tsx`) rendered with its right edge visibly cropped — reported directly, with a note that it was the same on mobile.
+- **Signal:** Both were visual, not thrown — no console error, no failed build, no type error. Both were only visible by actually looking at the rendered chart.
+- **Root Cause (both cases, same shape):** An SVG element's computed position placed part of its own geometry outside the `<svg viewBox="...">` bounds, and a browser's default behavior is to silently clip anything outside the viewBox — no warning, no fallback, nothing in dev tools flags it as an error. In the label case, the text's baseline (`y=6` after the old margin math) put its ascenders at a slightly negative y, above the viewBox's top edge. In the node case, the rightmost node's fixed `cx` plus half its fixed width (`900 + 148/2 = 974`) exceeded the chart's own `viewBox` width (`960`) by 14px.
+- **Fix (label):** Gave the label a fixed, safely-positive `y` and enough top margin (`M.top: 8 → 18`) to sit clear of the edge.
+- **Fix (node):** Widened the diagram's `viewBox` width (`W: 960 → 1000`) so the existing node position sits fully inside it.
+- **Lesson:** This is the same failure shape twice, in two different charts, from two different specific causes (a text-baseline calculation; a fixed node's coordinate math) — which makes it worth naming as a general check rather than treating each as a one-off: **whenever a chart's own content is positioned close to a fixed `viewBox` edge — a label near the top, a node near the right, anything computed rather than eyeballed — check the actual computed bounding box against the viewBox bounds, with margin, before trusting that "it built cleanly" means "it renders fully."** Neither instance would have been caught by `tsc`/`vite build`/`eslint`; both were only caught by looking at the rendered chart, which is the same structural gap `RETROSPECTIVE-PROCESS-AND-COLLABORATION.md` already names for this project's scoring-engine bugs — real-world observation is this project's actual verification mechanism for anything geometric, not just anything statistical.
+
+## Long, dense paragraphs reducing readability in the page's long-form copy
+
+- **Problem:** Several of the page's explanatory paragraphs (the six `AcademicNote` sourced notes, the "Source & methodology" text) ran 4-6 sentences as a single unbroken block — accurate and well-sourced, but visually dense enough to discourage actually reading them.
+- **Signal:** Reported directly, with a concrete worked example showing exactly where two specific paragraphs should split, and the general rule to apply everywhere: break a long paragraph into 2-3 shorter ones with spacing between them, applied site-wide, not just to the two examples given.
+- **Root Cause:** `AcademicNote.tsx` forced all of its `children` through a single wrapping `<p>` tag, so a call site had no way to introduce a paragraph break even if the underlying copy had a natural one — the component's own API made the fix (break the text apart) impossible without first changing the component.
+- **Fix:** Removed `AcademicNote`'s implicit `<p>` wrapper so it renders `children` directly, matching the pattern `DisclaimerCallout` already used; added `.academic-note p` spacing (`margin: 0 0 12px`, `:last-child` zeroed) so multiple `<p>` tags read as a page, not a wall; split each of the six notes and the methodology text into 2-3 paragraphs at natural sentence-group boundaries; applied the same `p`/`:last-child` spacing pattern to `.methodology-text`.
+- **Lesson:** A "single paragraph" content component (one `<p>` wrapper baked into the component itself) silently caps how the copy inside it can ever be formatted, regardless of how the copy is actually written — the same trap as `RETROSPECTIVE-BUGS-AND-ROOT-CAUSES.md`'s earlier "AcademicNote paragraphs bounded... no headers" finding, recurring in a new form. A component meant to hold long-form prose should let its content define its own paragraph breaks from the start, the way `DisclaimerCallout` already did — this was fixed reactively here, but is worth defaulting to for any future long-form content component in this codebase.
