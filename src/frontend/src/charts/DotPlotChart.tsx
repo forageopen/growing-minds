@@ -13,7 +13,7 @@ interface Props {
 
 const W = 640;
 const ROW_H = 34;
-const M = { top: 8, right: 24, bottom: 24, left: 140 };
+const M = { top: 18, right: 24, bottom: 24, left: 140 };
 
 export function DotPlotChart({ data, populationMean, order, labelFor, markerKey }: Props) {
   const [hover, setHover] = useState<string | null>(null);
@@ -41,7 +41,7 @@ export function DotPlotChart({ data, populationMean, order, labelFor, markerKey 
           y2={H - M.bottom}
           className="reference-line"
         />
-        <text x={x(populationMean)} y={M.top - 0} textAnchor="middle" className="axis-label" dy={-2}>
+        <text x={x(populationMean)} y={10} textAnchor="middle" className="axis-label">
           pop. mean {populationMean.toFixed(0)}
         </text>
 
