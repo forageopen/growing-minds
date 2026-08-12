@@ -453,7 +453,7 @@ export default function App() {
         )}
 
         <ChartCard title="Source & methodology" subtitle="What 'synthetic' means for this specific dataset">
-          <p style={{ fontSize: 12.5, color: "var(--abd-text-secondary)", lineHeight: 1.65, margin: "0 0 10px" }}>
+          <p className="methodology-text">
             Every row is procedurally generated — no real child or study participant is reproduced, and privacy is
             guaranteed by construction. But the generator's parameters are calibrated to published research rather
             than invented: the parental-midpoint–to–child-IQ correlation is set to ~0.53 (Reed &amp; Rich), childhood
@@ -465,7 +465,7 @@ export default function App() {
             psychological assessment or a statement about any real person or group — and deliberately excludes race
             or ethnicity as a predictor, since framing group IQ differences as genetic has no scientific basis.
           </p>
-          <p style={{ fontSize: 11.5, color: "var(--abd-text-muted)", margin: 0 }}>
+          <p className="methodology-source">
             Source:{" "}
             <a href="https://www.kaggle.com/datasets/sergionefedov/child-iq-genes-environment" target="_blank" rel="noreferrer">
               Child IQ: Genes &amp; Environment

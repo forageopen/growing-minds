@@ -47,13 +47,8 @@ export function CorrelationHeatmap({ variables, values, labels }: Props) {
             row.map((v, ci) => {
               const isHover = hover?.[0] === ri && hover?.[1] === ci;
               return (
-                <g
-                  key={`${ri}-${ci}`}
-                  className={reducedMotion ? undefined : "mosaic-cell"}
-                  style={reducedMotion ? undefined : { animationDelay: `${(ri + ci) * 0.07}s` }}
-                  onMouseEnter={() => setHover([ri, ci])}
-                  onMouseLeave={() => setHover(null)}
-                >
+                <g key={`${ri}-${ci}`} onMouseEnter={() => setHover([ri, ci])} onMouseLeave={() => setHover(null)}>
+                  {/* base cell: always fully visible, never animated — this is the reference data */}
                   <rect
                     x={ci * CELL + 2}
                     y={ri * CELL + 2}
@@ -65,6 +60,20 @@ export function CorrelationHeatmap({ variables, values, labels }: Props) {
                     strokeWidth={1.5}
                     style={{ cursor: "pointer" }}
                   />
+                  {/* traveling color-wash: a lighter overlay sweeps across cells, data underneath never hidden */}
+                  {!reducedMotion && (
+                    <rect
+                      x={ci * CELL + 2}
+                      y={ri * CELL + 2}
+                      width={CELL - 4}
+                      height={CELL - 4}
+                      rx={4}
+                      fill="var(--chart-surface)"
+                      opacity={0}
+                      className="heatmap-wave"
+                      style={{ animationDelay: `${(ri + ci) * 0.07}s`, pointerEvents: "none" }}
+                    />
+                  )}
                   <text
                     x={ci * CELL + CELL / 2}
                     y={ri * CELL + CELL / 2}
