@@ -769,6 +769,14 @@ code {
   color: var(--abd-text-primary);
 }
 
+.disclaimer-callout p {
+  margin: 0 0 10px;
+}
+
+.disclaimer-callout p:last-child {
+  margin-bottom: 0;
+}
+
 /* ---- profile builder ---------------------------------------------------- */
 .profile-builder {
   display: flex;
@@ -1031,4 +1039,53 @@ code {
   font-size: var(--text-xs);
   color: var(--abd-text-muted);
   margin: 0;
+}
+
+/* ---- academic bridge notes ------------------------------------------------ */
+.academic-note {
+  border-left: 3px solid var(--abd-border);
+  padding: 2px 0 2px 18px;
+  max-width: 74ch;
+}
+
+.academic-note p {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: var(--text-md);
+  line-height: 1.65;
+  color: var(--abd-text-secondary);
+}
+
+.academic-note cite {
+  font-style: normal;
+  color: var(--abd-text-muted);
+  font-size: var(--text-sm);
+}
+
+.reading-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.reading-list li {
+  font-size: var(--text-sm);
+  color: var(--abd-text-secondary);
+  line-height: 1.55;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--abd-border);
+}
+
+.reading-list li:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.reading-list .cite-title {
+  color: var(--abd-text-primary);
+  font-weight: 600;
 }

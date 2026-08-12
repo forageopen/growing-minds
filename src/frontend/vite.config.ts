@@ -1,10 +1,10 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 
-// Base path matches the GitHub Pages project URL: forageopen.github.io/Baby-Boom/
+// Base path matches the GitHub Pages project URL: forageopen.github.io/growing-minds/
 export default defineConfig({
   plugins: [react()],
-  base: "/Baby-Boom/",
+  base: "/growing-minds/",
   server: {
     port: 4174,
   },

@@ -4,7 +4,7 @@ import { Moon, Sun } from "lucide-react";
 type Theme = "light" | "dark";
 
 function getInitial(): Theme {
-  const stored = localStorage.getItem("baby-boom-theme");
+  const stored = localStorage.getItem("growing-minds-theme");
   if (stored === "light" || stored === "dark") return stored;
   return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
 }
@@ -14,7 +14,7 @@ export function ThemeToggle() {
 
   useEffect(() => {
     document.documentElement.setAttribute("data-theme", theme);
-    localStorage.setItem("baby-boom-theme", theme);
+    localStorage.setItem("growing-minds-theme", theme);
   }, [theme]);
 
   return (

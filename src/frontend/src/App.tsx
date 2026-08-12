@@ -35,6 +35,8 @@ import { FactorSplit } from "./components/FactorSplit";
 import { Primer } from "./components/Primer";
 import { InfoTip } from "./components/InfoTip";
 import { VariableSelectionCaseStudy } from "./components/VariableSelectionCaseStudy";
+import { AcademicNote } from "./components/AcademicNote";
+import { ReadingList } from "./components/ReadingList";
 
 import { CausalFlowChart } from "./charts/CausalFlowChart";
 import { FlynnEffectChart } from "./charts/FlynnEffectChart";
@@ -135,15 +137,15 @@ export default function App() {
         <div className="app-header-title">
           <Baby size={26} strokeWidth={2} />
           <div>
-            <h1>Baby Boom</h1>
-            <p>An educational look at child development</p>
+            <h1>Where Do You Sit?</h1>
+            <p>Explore your position among 50,000 simulated childhood profiles.</p>
           </div>
         </div>
         <div className="app-header-actions">
           <ThemeToggle />
           <a
             className="icon-button"
-            href="https://github.com/forageopen/Baby-Boom"
+            href="https://github.com/forageopen/growing-minds"
             target="_blank"
             rel="noreferrer"
             aria-label="View source on GitHub"
@@ -160,18 +162,28 @@ export default function App() {
           <h1>Where do you sit among 50,000 childhoods?</h1>
           <p>
             Explore a synthetic research dataset of 50,000 simulated children to see how family background,
-            pregnancy, and early environment relate to a single narrow measure — a childhood IQ score. Build a
-            rough profile of your own background below, or just explore the population as a whole.
+            pregnancy, nutrition, education, and early environment relate to a single narrow measure of cognitive
+            performance: a childhood IQ score. Build a rough profile based on your own background below, or
+            explore the population as a whole.
           </p>
         </section>
 
         <DisclaimerCallout>
-          <strong>This is not an assessment of you or anyone else.</strong> No real child or study participant
-          appears in this dataset — every row is procedurally generated. But the effect sizes behind that
-          generation aren't invented: they're calibrated to published meta-analyses (parental-IQ correlation,
-          twin/adoption heritability, iodine-deficiency effects, and more — see "About this dataset" below for the
-          full sourcing). IQ is one narrow, imperfect measure of cognitive ability, not a measure of worth or
-          potential. Nothing you enter here is stored, sent anywhere, or used for anything beyond this page.
+          <p>
+            <strong>This is not an assessment of you or anyone else.</strong> No real child or study participant
+            appears in this dataset. Every row is procedurally generated. The relationships modeled in the dataset
+            are informed by findings reported in published research and meta-analyses, including parental-IQ
+            correlations, childhood heritability estimates, iodine deficiency, lead exposure, and environmental
+            influences on development. These findings were used to calibrate the synthetic model and should not be
+            interpreted as measurements or predictions of real individuals. See "About this dataset" for the
+            methodology and sources.
+          </p>
+          <p>
+            IQ is a narrow and imperfect measure of certain aspects of cognitive performance. It does not measure a
+            person's worth, character, creativity, or future potential. The profile you create here is an
+            exploration of population-level patterns, not a prediction of your own ability or development. Nothing
+            you enter here is stored, sent anywhere, or used for anything beyond this page.
+          </p>
         </DisclaimerCallout>
 
         <Primer />
@@ -182,6 +194,17 @@ export default function App() {
           title="Where do I sit?"
           lede="Answer as many or as few questions as you like — the population average fills in anything you skip."
         />
+
+        <AcademicNote>
+          Human development resists summary by any single indicator. The capability approach underlying the
+          human-development paradigm treats well-being as inherently multidimensional — what a person is able to
+          do and be — and composite indices inevitably lose the trade-offs between the dimensions they combine
+          (Fukuda-Parr, 2003). Aggregate averages compound the problem: population-level statistics routinely mask
+          substantial variation at the individual and sub-national scale (Hopkins et al., 2023). The profile below
+          exists for that reason — not to produce a verdict, but to place one configuration of factors against the
+          shape of the whole population, so the gap between "the average" and "this specific combination" stays
+          visible instead of collapsing into a single number.
+        </AcademicNote>
 
         <div className="chart-grid-2">
           <ChartCard title="Build a rough profile" subtitle="Based on your own background, growing up">
@@ -287,6 +310,18 @@ export default function App() {
             <FlynnEffectChart data={flynnEffect} />
           </ChartCard>
         )}
+
+        <AcademicNote>
+          No single chart is sufficient for multi-level data. Research on how audiences interpret data
+          visualizations of inequity found that individual-level views draw attention to outliers, group-level
+          views prompt more cautious contextual reasoning, and derived summary statistics can create false
+          certainty when shown alone — different forms support different, complementary judgments, and none is
+          adequate by itself (Reinholz et al., 2023). That is the reasoning behind pairing a per-factor ranking
+          (the lollipop chart below) with a full pairwise correlation matrix (the heatmap beside it): the first
+          shows each factor's own association with the outcome; the second shows how those factors relate to
+          each other — exactly the overlap the profile engine has to correct for, and information a ranked list
+          alone cannot reveal.
+        </AcademicNote>
 
         <div className="chart-grid-2">
           {correlations && (
@@ -398,6 +433,17 @@ export default function App() {
           lede="The strongest associations in this dataset — genetics, SES, birth history — are also the ones nobody can act on after the fact. The smaller, modifiable ones are where real intervention happens."
         />
 
+        <AcademicNote>
+          Distinguishing what is fixed from what remains open is not just an analytic convenience — it reflects
+          how developmental outcomes are actually produced. Community-based systems-dynamics research modeling
+          children's social and emotional well-being found that distal factors — policy investment, service wait
+          times, caregiver stress — are causally linked to individual outcomes through feedback loops spanning
+          government, community, interpersonal, and family levels (Poon et al., 2022). Calling a factor "fixed"
+          therefore describes its status for one child at one point in time, not its status as a lever for policy
+          or future intervention: the same factor can be unchangeable in a retrospective profile and still be
+          exactly where an upstream investment would matter most.
+        </AcademicNote>
+
         {correlations && (
           <ChartCard
             title="Fixed history vs. shapeable environment"
@@ -440,6 +486,16 @@ export default function App() {
           </ChartCard>
         )}
 
+        <AcademicNote>
+          Visualization's value is not confined to analysis. Data visualization has been used deliberately as a
+          tool for empowerment — layering statistical trends with personal narrative so data becomes a platform
+          for dialogue rather than a one-way report (Rojas &amp; Ju, 2009) — and to enable collective,
+          socially-supported interpretation of data across non-expert audiences (Heer &amp; Hellerstein, 2009).
+          That is the reason this page was built as something to interact with rather than a static report:
+          understanding a population's patterns is only useful insofar as it returns some agency to the person
+          doing the looking.
+        </AcademicNote>
+
         {/* ---------------- appendix: about the dataset ---------------- */}
         <SectionHeader number="—" title="About this dataset" lede="For the curious: methodology, validation, and the full column reference." />
 
@@ -472,6 +528,10 @@ export default function App() {
             </a>{" "}
             (Kaggle, sergionefedov, CC0).
           </p>
+        </ChartCard>
+
+        <ChartCard title="Further reading" subtitle="The research cited in the notes throughout this page">
+          <ReadingList />
         </ChartCard>
 
         {dictionary && (

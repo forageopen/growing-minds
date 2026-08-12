@@ -1,9 +1,11 @@
-# Baby Boom
+# Growing Minds
 
-An interactive dashboard exploring genetic and environmental predictors of
-child IQ, built on a 50,000-child synthetic research dataset.
+**Where Do You Sit?** Explore your position among 50,000 simulated childhood
+profiles — an interactive look at how family background, pregnancy,
+nutrition, education, and early environment relate to a synthetic measure
+of childhood IQ.
 
-**Live dashboard:** https://forageopen.github.io/Baby-Boom/
+**Live dashboard:** https://forageopen.github.io/growing-minds/
 
 ## Dataset
 
