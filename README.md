@@ -1,4 +1,4 @@
-# Baby Boom
+# Growing Minds
 
 An interactive dashboard exploring genetic and environmental predictors of
 child IQ, built on a 50,000-child synthetic research dataset.
