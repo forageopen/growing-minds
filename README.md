@@ -3,7 +3,7 @@
 An interactive dashboard exploring genetic and environmental predictors of
 child IQ, built on a 50,000-child synthetic research dataset.
 
-**Live dashboard:** https://forageopen.github.io/Baby-Boom/
+**Live dashboard:** [https://forageopen.github.io/Baby-Boom/](https://forageopen.github.io/growing-minds/)
 
 ## Dataset
 
