@@ -166,10 +166,12 @@ export default function App() {
         </section>
 
         <DisclaimerCallout>
-          <strong>This is not an assessment of you or anyone else.</strong> The dataset is entirely synthetic —
-          generated to resemble patterns reported in developmental research, not drawn from real children. IQ is
-          one narrow, imperfect measure of cognitive ability, not a measure of worth or potential. Nothing you
-          enter here is stored, sent anywhere, or used for anything beyond this page.
+          <strong>This is not an assessment of you or anyone else.</strong> No real child or study participant
+          appears in this dataset — every row is procedurally generated. But the effect sizes behind that
+          generation aren't invented: they're calibrated to published meta-analyses (parental-IQ correlation,
+          twin/adoption heritability, iodine-deficiency effects, and more — see "About this dataset" below for the
+          full sourcing). IQ is one narrow, imperfect measure of cognitive ability, not a measure of worth or
+          potential. Nothing you enter here is stored, sent anywhere, or used for anything beyond this page.
         </DisclaimerCallout>
 
         <Primer />
@@ -449,6 +451,28 @@ export default function App() {
             <StatTile icon={ShieldCheck} label="Preterm births" value={`${(overview.pretermRate * 100).toFixed(1)}%`} sub={`${(overview.lowBirthWeightRate * 100).toFixed(1)}% low birth weight`} />
           </section>
         )}
+
+        <ChartCard title="Source & methodology" subtitle="What 'synthetic' means for this specific dataset">
+          <p style={{ fontSize: 12.5, color: "var(--abd-text-secondary)", lineHeight: 1.65, margin: "0 0 10px" }}>
+            Every row is procedurally generated — no real child or study participant is reproduced, and privacy is
+            guaranteed by construction. But the generator's parameters are calibrated to published research rather
+            than invented: the parental-midpoint–to–child-IQ correlation is set to ~0.53 (Reed &amp; Rich), childhood
+            heritability to the ~0.4 range reported by twin/adoption studies, iodine deficiency to roughly -7 to -12
+            IQ points (multiple meta-analyses), and lead exposure, prematurity, low birth weight, and breastfeeding's
+            SES-confounded effect are modeled the same way. Regression to the mean and a Flynn-effect drift by birth
+            year are built in deliberately. These sources shaped the simulator's design only — no data from them is
+            reproduced here. The dataset creator is explicit that this is an educational modeling tool, not a
+            psychological assessment or a statement about any real person or group — and deliberately excludes race
+            or ethnicity as a predictor, since framing group IQ differences as genetic has no scientific basis.
+          </p>
+          <p style={{ fontSize: 11.5, color: "var(--abd-text-muted)", margin: 0 }}>
+            Source:{" "}
+            <a href="https://www.kaggle.com/datasets/sergionefedov/child-iq-genes-environment" target="_blank" rel="noreferrer">
+              Child IQ: Genes &amp; Environment
+            </a>{" "}
+            (Kaggle, sergionefedov, CC0).
+          </p>
+        </ChartCard>
 
         {dictionary && (
           <ChartCard title="Data dictionary" subtitle="All 30 columns in the source dataset">
