@@ -1,0 +1,152 @@
+[
+  {
+    "column": "child_id",
+    "type": "string",
+    "description": "Unique child id"
+  },
+  {
+    "column": "child_sex",
+    "type": "string",
+    "description": "M / F"
+  },
+  {
+    "column": "child_age_at_test",
+    "type": "int",
+    "description": "Age when IQ was assessed (6-12)"
+  },
+  {
+    "column": "birth_year",
+    "type": "int",
+    "description": "Year of birth (2005-2020) — proxy for the Flynn effect"
+  },
+  {
+    "column": "birth_order",
+    "type": "int",
+    "description": "Birth order (1=firstborn)"
+  },
+  {
+    "column": "mother_iq",
+    "type": "int",
+    "description": "Mother IQ (population mean 100"
+  },
+  {
+    "column": "father_iq",
+    "type": "int",
+    "description": "Father IQ (population mean 100"
+  },
+  {
+    "column": "parental_ses",
+    "type": "float",
+    "description": "Parental socioeconomic status composite (0-100) — also a confounder of parent IQ"
+  },
+  {
+    "column": "maternal_education_years",
+    "type": "int",
+    "description": "Mother years of education"
+  },
+  {
+    "column": "household_income_bracket",
+    "type": "string",
+    "description": "very_low / low / middle / high / very_high"
+  },
+  {
+    "column": "two_parent_household",
+    "type": "int",
+    "description": "1 if two-parent household"
+  },
+  {
+    "column": "maternal_age_at_birth",
+    "type": "int",
+    "description": "Mother age at the child's birth"
+  },
+  {
+    "column": "iodine_status",
+    "type": "string",
+    "description": "Prenatal iodine status: deficient / mild_low / adequate — deficiency costs ~7-12 IQ pts"
+  },
+  {
+    "column": "prenatal_care",
+    "type": "string",
+    "description": "none / some / regular"
+  },
+  {
+    "column": "maternal_smoking_pregnancy",
+    "type": "int",
+    "description": "1 if mother smoked during pregnancy"
+  },
+  {
+    "column": "alcohol_exposure",
+    "type": "int",
+    "description": "1 if prenatal alcohol exposure"
+  },
+  {
+    "column": "gestational_age_weeks",
+    "type": "int",
+    "description": "Gestational age at birth (weeks)"
+  },
+  {
+    "column": "preterm",
+    "type": "int",
+    "description": "1 if born before 37 weeks"
+  },
+  {
+    "column": "birth_weight_g",
+    "type": "int",
+    "description": "Birth weight (grams)"
+  },
+  {
+    "column": "low_birth_weight",
+    "type": "int",
+    "description": "1 if under 2500g"
+  },
+  {
+    "column": "breastfed_months",
+    "type": "int",
+    "description": "Months breastfed (small cognitive association"
+  },
+  {
+    "column": "lead_exposure",
+    "type": "string",
+    "description": "Early lead exposure: low / moderate / elevated — dose-dependent harm"
+  },
+  {
+    "column": "home_stimulation_score",
+    "type": "int",
+    "description": "Cognitive stimulation in the home (HOME-style"
+  },
+  {
+    "column": "early_education",
+    "type": "string",
+    "description": "none / some_preschool / quality_preschool"
+  },
+  {
+    "column": "books_in_home",
+    "type": "int",
+    "description": "Number of books in the home"
+  },
+  {
+    "column": "screen_hours_daily",
+    "type": "float",
+    "description": "Daily screen time (hours)"
+  },
+  {
+    "column": "nutrition_quality",
+    "type": "float",
+    "description": "Childhood nutrition quality (0-10)"
+  },
+  {
+    "column": "adverse_childhood_experiences",
+    "type": "int",
+    "description": "ACE count (0-10)"
+  },
+  {
+    "column": "child_iq",
+    "type": "int",
+    "description": "TARGET (continuous): child IQ score"
+  },
+  {
+    "column": "high_cognitive_potential",
+    "type": "int",
+    "description": "TARGET (binary): 1 if child IQ in the top decile"
+  }
+]

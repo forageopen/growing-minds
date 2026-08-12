@@ -1,0 +1,166 @@
+/*
+  Design tokens sourced from Atlassian Design System (@atlaskit/tokens palette,
+  brand-refresh ramp). The 8-hue categorical order below was run through the
+  dataviz skill's validate_palette.js:
+    light — all hard gates PASS (worst adjacent CVD dE 8.0, normal-vision dE 24.3)
+    dark  — all hard gates PASS (worst adjacent CVD dE 6.8 — 6-8 floor band,
+            mitigated with direct labels / legend, never color-alone)
+*/
+:root {
+  color-scheme: light;
+
+  /* surfaces */
+  --abd-page: #f8f8f8;
+  --abd-surface: #ffffff;
+  --abd-surface-raised: #ffffff;
+  --abd-border: #dddee1;
+  --abd-border-hairline: rgba(23, 43, 77, 0.12);
+
+  /* ink */
+  --abd-text-primary: #1e1f21;
+  --abd-text-secondary: #6b6e76;
+  --abd-text-muted: #8c8f97;
+  --abd-link: #357de8;
+
+  /* chart chrome */
+  --chart-surface: #ffffff;
+  --chart-grid: #dddee1;
+  --chart-axis: #b7b9be;
+  --chart-tooltip-bg: #1e1f21;
+  --chart-tooltip-text: #ffffff;
+
+  /* brand accent */
+  --abd-brand-bold: #0c66e4;
+  --abd-brand-subtle: #e9f2fe;
+
+  /* status */
+  --status-good: #22a06b;
+  --status-warning: #e2b203;
+  --status-serious: #e56910;
+  --status-critical: #e2483d;
+
+  /* categorical series (validated order — never reorder, never cycle) */
+  --series-1: #4688ec; /* blue */
+  --series-2: #f68909; /* orange */
+  --series-3: #42b2d7; /* teal */
+  --series-4: #cf9f02; /* yellow */
+  --series-5: #da62ac; /* magenta */
+  --series-6: #2abb7f; /* green */
+  --series-7: #bf63f3; /* purple */
+  --series-8: #f15b50; /* red */
+
+  /* diverging (correlation sign) */
+  --diverging-pos: #4688ec;
+  --diverging-neg: #f15b50;
+  --diverging-mid: #f0f1f2;
+
+  /* sequential (blue, light -> dark) */
+  --seq-100: #e9f2fe;
+  --seq-300: #8fb8f6;
+  --seq-500: #4688ec;
+  --seq-700: #1868db;
+
+  --radius-card: 8px;
+  --radius-tile: 6px;
+  --shadow-card: 0 1px 1px rgba(23, 43, 77, 0.15), 0 0 1px rgba(23, 43, 77, 0.25);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+
+    --abd-page: #14151a;
+    --abd-surface: #1d2125;
+    --abd-surface-raised: #242528;
+    --abd-border: #303134;
+    --abd-border-hairline: rgba(226, 227, 228, 0.14);
+
+    --abd-text-primary: #e2e3e4;
+    --abd-text-secondary: #bfc1c4;
+    --abd-text-muted: #7e8188;
+    --abd-link: #669df1;
+
+    --chart-surface: #1d2125;
+    --chart-grid: #303134;
+    --chart-axis: #4b4d51;
+    --chart-tooltip-bg: #e2e3e4;
+    --chart-tooltip-text: #1d2125;
+
+    --abd-brand-bold: #669df1;
+    --abd-brand-subtle: #123263;
+
+    --status-good: #4bce97;
+    --status-warning: #e2b203;
+    --status-serious: #e56910;
+    --status-critical: #f87168;
+
+    --series-1: #357de8;
+    --series-2: #e06c00;
+    --series-3: #2898bd;
+    --series-4: #b38600;
+    --series-5: #cd519d;
+    --series-6: #22a06b;
+    --series-7: #af59e1;
+    --series-8: #e2483d;
+
+    --diverging-pos: #357de8;
+    --diverging-neg: #e2483d;
+    --diverging-mid: #303134;
+
+    --seq-100: #123263;
+    --seq-300: #1868db;
+    --seq-500: #357de8;
+    --seq-700: #8fb8f6;
+
+    --shadow-card: 0 1px 1px rgba(0, 0, 0, 0.35), 0 0 1px rgba(0, 0, 0, 0.5);
+  }
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+
+  --abd-page: #14151a;
+  --abd-surface: #1d2125;
+  --abd-surface-raised: #242528;
+  --abd-border: #303134;
+  --abd-border-hairline: rgba(226, 227, 228, 0.14);
+
+  --abd-text-primary: #e2e3e4;
+  --abd-text-secondary: #bfc1c4;
+  --abd-text-muted: #7e8188;
+  --abd-link: #669df1;
+
+  --chart-surface: #1d2125;
+  --chart-grid: #303134;
+  --chart-axis: #4b4d51;
+  --chart-tooltip-bg: #e2e3e4;
+  --chart-tooltip-text: #1d2125;
+
+  --abd-brand-bold: #669df1;
+  --abd-brand-subtle: #123263;
+
+  --status-good: #4bce97;
+  --status-warning: #e2b203;
+  --status-serious: #e56910;
+  --status-critical: #f87168;
+
+  --series-1: #357de8;
+  --series-2: #e06c00;
+  --series-3: #2898bd;
+  --series-4: #b38600;
+  --series-5: #cd519d;
+  --series-6: #22a06b;
+  --series-7: #af59e1;
+  --series-8: #e2483d;
+
+  --diverging-pos: #357de8;
+  --diverging-neg: #e2483d;
+  --diverging-mid: #303134;
+
+  --seq-100: #123263;
+  --seq-300: #1868db;
+  --seq-500: #357de8;
+  --seq-700: #8fb8f6;
+
+  --shadow-card: 0 1px 1px rgba(0, 0, 0, 0.35), 0 0 1px rgba(0, 0, 0, 0.5);
+}

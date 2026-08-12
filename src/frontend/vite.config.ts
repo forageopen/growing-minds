@@ -1,0 +1,15 @@
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
+
+// Base path matches the GitHub Pages project URL: forageopen.github.io/Baby-Boom/
+export default defineConfig({
+  plugins: [react()],
+  base: "/Baby-Boom/",
+  server: {
+    port: 4174,
+  },
+  preview: {
+    port: 4174,
+    strictPort: true,
+  },
+});

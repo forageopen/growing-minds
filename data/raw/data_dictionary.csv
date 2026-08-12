@@ -1,0 +1,31 @@
+column,type,description
+child_id,string,Unique child id
+child_sex,string,M / F
+child_age_at_test,int,Age when IQ was assessed (6-12)
+birth_year,int,Year of birth (2005-2020) — proxy for the Flynn effect
+birth_order,int,Birth order (1=firstborn)
+mother_iq,int,"Mother IQ (population mean 100, sd 15)"
+father_iq,int,"Father IQ (population mean 100, sd 15)"
+parental_ses,float,Parental socioeconomic status composite (0-100) — also a confounder of parent IQ
+maternal_education_years,int,Mother years of education
+household_income_bracket,string,very_low / low / middle / high / very_high
+two_parent_household,int,1 if two-parent household
+maternal_age_at_birth,int,Mother age at the child's birth
+iodine_status,string,Prenatal iodine status: deficient / mild_low / adequate — deficiency costs ~7-12 IQ pts
+prenatal_care,string,none / some / regular
+maternal_smoking_pregnancy,int,1 if mother smoked during pregnancy
+alcohol_exposure,int,1 if prenatal alcohol exposure
+gestational_age_weeks,int,Gestational age at birth (weeks)
+preterm,int,1 if born before 37 weeks
+birth_weight_g,int,Birth weight (grams)
+low_birth_weight,int,1 if under 2500g
+breastfed_months,int,"Months breastfed (small cognitive association, largely SES-confounded)"
+lead_exposure,string,Early lead exposure: low / moderate / elevated — dose-dependent harm
+home_stimulation_score,int,"Cognitive stimulation in the home (HOME-style, 0-100)"
+early_education,string,none / some_preschool / quality_preschool
+books_in_home,int,Number of books in the home
+screen_hours_daily,float,Daily screen time (hours)
+nutrition_quality,float,Childhood nutrition quality (0-10)
+adverse_childhood_experiences,int,ACE count (0-10)
+child_iq,int,TARGET (continuous): child IQ score
+high_cognitive_potential,int,TARGET (binary): 1 if child IQ in the top decile
