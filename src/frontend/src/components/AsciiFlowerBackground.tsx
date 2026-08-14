@@ -43,6 +43,7 @@ const BASE_CELL_PX = 7;
 const FRAME_MS = 140;
 const GLITCH_PERIOD_MS = 2600;
 const GLITCH_FRACTION = 0.32;
+const ROTATION_PERIOD_MS = 32000;
 
 function hash(a: number, b: number): number {
   let h = (a * 374761393 + b * 668265263) ^ (a << 13);
@@ -159,7 +160,22 @@ export function AsciiFlowerBackground() {
           const cellPx = BASE_CELL_PX * (0.75 + hash(sx * 53 + 9, sy * 59 + 13) * 0.55);
           const originX = sx * SLOT_W + jx;
           const originY = sy * SLOT_H + jy;
-          drawFlower(originX, originY, cellPx, sx, sy, nowMs);
+          const flowerW = MASK_W * cellPx;
+          const flowerH = MASK_H * cellPx;
+          const centerX = originX + flowerW / 2;
+          const centerY = originY + flowerH / 2;
+
+          const spinDir = hash(sx * 61 + 17, sy * 67 + 19) < 0.5 ? -1 : 1;
+          const spinPeriod = ROTATION_PERIOD_MS * (0.6 + hash(sx * 71 + 23, sy * 73 + 29) * 0.8);
+          const spinPhase = hash(sx * 79 + 31, sy * 83 + 37) * Math.PI * 2;
+          const angle = spinDir * ((nowMs / spinPeriod) * Math.PI * 2 + spinPhase);
+
+          ctx.save();
+          ctx.translate(centerX, centerY);
+          ctx.rotate(angle);
+          ctx.translate(-flowerW / 2, -flowerH / 2);
+          drawFlower(0, 0, cellPx, sx, sy, nowMs);
+          ctx.restore();
         }
       }
     }
