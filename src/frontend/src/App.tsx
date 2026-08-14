@@ -28,6 +28,7 @@ import { ChartCard } from "./components/ChartCard";
 import { ThemeToggle } from "./components/ThemeToggle";
 import { AsciiFlowerToggle } from "./components/AsciiFlowerToggle";
 import { AsciiFlowerBackground } from "./components/AsciiFlowerBackground";
+import { GlassBlurToggle } from "./components/GlassBlurToggle";
 import { DictionaryTable } from "./components/DictionaryTable";
 import { SectionHeader } from "./components/SectionHeader";
 import { DisclaimerCallout } from "./components/DisclaimerCallout";
@@ -106,6 +107,23 @@ export default function App() {
     }
   }, [asciiBg]);
 
+  const [glassBlur, setGlassBlur] = useState<boolean>(() => {
+    try {
+      return localStorage.getItem("growing-minds-glass-blur") === "on";
+    } catch {
+      return false;
+    }
+  });
+
+  useEffect(() => {
+    document.body.classList.toggle("glass-on", glassBlur);
+    try {
+      localStorage.setItem("growing-minds-glass-blur", glassBlur ? "on" : "off");
+    } catch {
+      // localStorage unavailable (e.g. private browsing) — preference just won't persist
+    }
+  }, [glassBlur]);
+
   const profileHasSelection = hasSelection(profile);
 
   const scoreResult = useMemo(() => {
@@ -163,6 +181,7 @@ export default function App() {
         </div>
         <div className="app-header-actions">
           <AsciiFlowerToggle enabled={asciiBg} onToggle={() => setAsciiBg((v) => !v)} />
+          <GlassBlurToggle enabled={glassBlur} onToggle={() => setGlassBlur((v) => !v)} />
           <ThemeToggle />
           <a
             className="icon-button"
