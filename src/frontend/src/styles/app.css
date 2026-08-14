@@ -83,6 +83,22 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+/* ASCII flower background theme: body turns transparent so the fixed,
+   negative-z-index canvas shows through in the gaps around the (still
+   opaque) header and cards. */
+body.ascii-bg-on {
+  background: transparent;
+}
+
+.ascii-flower-bg {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: -1;
+}
+
 h1, h2, h3, .position-number, .stat-tile-value {
   font-family: var(--font-serif);
   font-weight: 600;
@@ -149,6 +165,11 @@ a {
 }
 
 .icon-button:hover {
+  background: var(--abd-brand-subtle);
+  color: var(--abd-brand-bold);
+}
+
+.icon-button-active {
   background: var(--abd-brand-subtle);
   color: var(--abd-brand-bold);
 }

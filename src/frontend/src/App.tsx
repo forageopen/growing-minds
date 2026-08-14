@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Baby, Github, Users, Brain, TrendingUp, ShieldCheck } from "lucide-react";
 import { useJson } from "./lib/useJson";
 import { COLUMN_LABELS, CATEGORY_ORDERS, prettyKey } from "./lib/labels";
@@ -26,6 +26,8 @@ import type {
 import { StatTile } from "./components/StatTile";
 import { ChartCard } from "./components/ChartCard";
 import { ThemeToggle } from "./components/ThemeToggle";
+import { AsciiFlowerToggle } from "./components/AsciiFlowerToggle";
+import { AsciiFlowerBackground } from "./components/AsciiFlowerBackground";
 import { DictionaryTable } from "./components/DictionaryTable";
 import { SectionHeader } from "./components/SectionHeader";
 import { DisclaimerCallout } from "./components/DisclaimerCallout";
@@ -87,6 +89,22 @@ export default function App() {
   const [profile, setProfile] = useState<Profile>(emptyProfile());
   const [categoryVar, setCategoryVar] = useState<(typeof CATEGORY_VARS)[number]>("household_income_bracket");
   const [scatterVar, setScatterVar] = useState<(typeof SCATTER_VARS)[number]>("mother_iq");
+  const [asciiBg, setAsciiBg] = useState<boolean>(() => {
+    try {
+      return localStorage.getItem("growing-minds-ascii-bg") === "on";
+    } catch {
+      return false;
+    }
+  });
+
+  useEffect(() => {
+    document.body.classList.toggle("ascii-bg-on", asciiBg);
+    try {
+      localStorage.setItem("growing-minds-ascii-bg", asciiBg ? "on" : "off");
+    } catch {
+      // localStorage unavailable (e.g. private browsing) — theme just won't persist
+    }
+  }, [asciiBg]);
 
   const profileHasSelection = hasSelection(profile);
 
@@ -134,6 +152,7 @@ export default function App() {
 
   return (
     <div className="app-shell">
+      {asciiBg && <AsciiFlowerBackground />}
       <header className="app-header">
         <div className="app-header-title">
           <Baby size={26} strokeWidth={2} />
@@ -143,6 +162,7 @@ export default function App() {
           </div>
         </div>
         <div className="app-header-actions">
+          <AsciiFlowerToggle enabled={asciiBg} onToggle={() => setAsciiBg((v) => !v)} />
           <ThemeToggle />
           <a
             className="icon-button"
