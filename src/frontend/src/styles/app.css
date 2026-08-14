@@ -64,8 +64,7 @@
   .shimmer-rect,
   .heatmap-wave,
   .flow-comet,
-  .node-pulse,
-  .ascii-flower-bg {
+  .node-pulse {
     animation: none !important;
   }
 }
@@ -91,11 +90,6 @@ body.ascii-bg-on {
   background: transparent;
 }
 
-@keyframes ascii-bg-breathe {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.035); }
-}
-
 .ascii-flower-bg {
   position: fixed;
   inset: 0;
@@ -103,8 +97,6 @@ body.ascii-bg-on {
   height: 100vh;
   pointer-events: none;
   z-index: -1;
-  transform-origin: center center;
-  animation: ascii-bg-breathe 26s ease-in-out infinite;
 }
 
 h1, h2, h3, .position-number, .stat-tile-value {
