@@ -1,41 +1,48 @@
 import { useEffect, useRef } from "react";
 import { useReducedMotion } from "../lib/useReducedMotion";
 
-// A sparse field of tiny ASCII "plants," each independently cycling through
-// a full growth -> bloom -> wilt -> rest loop (metamorphosis), staggered by
-// a per-cell hash so the field never pulses in sync. Purely decorative:
-// aria-hidden, pointer-events: none, and frozen to a single frame when the
-// user prefers reduced motion.
+// A sparse field of small pixel-mosaic flower silhouettes. Each flower is a
+// fixed bitmap mask: interior pixels sit as a calm, steady fill, while the
+// pixels along the shape's boundary intermittently "glitch" into a colored
+// 8-bit data block with a tiny glyph, then settle back — as if the shape is
+// continuously assembling itself out of noise. Purely decorative: aria-hidden,
+// pointer-events: none, frozen to a single calm frame under reduced motion.
 
-type Role = "seed" | "stem" | "bloom" | "wilt";
-
-const PEAK = "\0"; // sentinel: swapped for a per-cell bloom glyph at draw time
-
-const STAGES: { ch: string; role: Role }[] = [
-  { ch: "·", role: "seed" },
-  { ch: "`", role: "seed" },
-  { ch: "'", role: "stem" },
-  { ch: "i", role: "stem" },
-  { ch: "!", role: "stem" },
-  { ch: "Y", role: "stem" },
-  { ch: "y", role: "bloom" },
-  { ch: PEAK, role: "bloom" },
-  { ch: PEAK, role: "bloom" },
-  { ch: "y", role: "bloom" },
-  { ch: "Y", role: "wilt" },
-  { ch: ",", role: "wilt" },
-  { ch: ".", role: "wilt" },
-  { ch: " ", role: "seed" },
-  { ch: " ", role: "seed" },
+const FLOWER_MASK: number[][] = [
+  [0, 0, 0, 0, 1, 0, 0, 0, 0],
+  [0, 0, 1, 1, 1, 1, 1, 0, 0],
+  [0, 1, 1, 1, 1, 1, 1, 1, 0],
+  [1, 1, 1, 1, 1, 1, 1, 1, 1],
+  [0, 1, 1, 1, 1, 1, 1, 1, 0],
+  [0, 0, 1, 1, 1, 1, 1, 0, 0],
+  [0, 0, 0, 1, 1, 1, 0, 0, 0],
+  [0, 0, 0, 0, 1, 0, 0, 0, 0],
+  [0, 0, 0, 0, 1, 0, 0, 0, 0],
+  [0, 0, 0, 0, 1, 0, 0, 0, 0],
 ];
+const MASK_H = FLOWER_MASK.length;
+const MASK_W = FLOWER_MASK[0].length;
 
-const BLOOM_GLYPHS = ["*", "%", "@", "+", "#", "&"];
-const CELL_W = 28;
-const CELL_H = 32;
-const DENSITY = 0.22;
-const FRAME_MS = 130;
-const CYCLE_BASE_MS = 11000;
-const CYCLE_JITTER_MS = 7000;
+// A filled cell is "boundary" if any neighbor (or the mask edge) is empty.
+const BOUNDARY: boolean[][] = FLOWER_MASK.map((row, r) =>
+  row.map((v, c) => {
+    if (!v) return false;
+    const up = r > 0 ? FLOWER_MASK[r - 1][c] : 0;
+    const down = r < MASK_H - 1 ? FLOWER_MASK[r + 1][c] : 0;
+    const left = c > 0 ? row[c - 1] : 0;
+    const right = c < MASK_W - 1 ? row[c + 1] : 0;
+    return !(up && down && left && right);
+  }),
+);
+
+const GLYPHS = ["0", "1", "2", "6", "8", "9", "#", "%", "&"];
+const SLOT_W = 190;
+const SLOT_H = 210;
+const SLOT_DENSITY = 0.5;
+const BASE_CELL_PX = 7;
+const FRAME_MS = 140;
+const GLITCH_PERIOD_MS = 2600;
+const GLITCH_FRACTION = 0.32;
 
 function hash(a: number, b: number): number {
   let h = (a * 374761393 + b * 668265263) ^ (a << 13);
@@ -59,19 +66,6 @@ function withAlpha(hex: string, alpha: number): string {
   return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 }
 
-function alphaFor(role: Role): number {
-  switch (role) {
-    case "bloom":
-      return 0.42;
-    case "stem":
-      return 0.24;
-    case "wilt":
-      return 0.18;
-    default:
-      return 0.12;
-  }
-}
-
 export function AsciiFlowerBackground() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const reducedMotion = useReducedMotion();
@@ -86,18 +80,18 @@ export function AsciiFlowerBackground() {
 
     let width = 0;
     let height = 0;
-    let cols = 0;
-    let rows = 0;
-    let seriesColors: string[] = [];
-    let stemColor = "#4f7350";
-    let wiltColor = "#8a7c8c";
-    let seedColor = "#c9bdb0";
+    let slotCols = 0;
+    let slotRows = 0;
+    let inkColor = "#8a7c8c";
+    let accentColors: string[] = [];
 
     function readPalette() {
-      seriesColors = [1, 2, 3, 4, 5, 6, 7, 8].map((n) => readVar(`--series-${n}`, "#4f7350"));
-      stemColor = readVar("--series-2", "#4f7350");
-      wiltColor = readVar("--abd-text-muted", "#8a7c8c");
-      seedColor = readVar("--chart-axis", "#c9bdb0");
+      inkColor = readVar("--abd-text-muted", "#8a7c8c");
+      accentColors = [
+        readVar("--series-1", "#80303e"), // burgundy, echoes the reference's red
+        readVar("--series-4", "#b07d1f"), // ochre, echoes the reference's orange
+        readVar("--series-7", "#3f597d"), // slate blue, echoes the reference's blue
+      ];
     }
 
     function resize() {
@@ -109,42 +103,63 @@ export function AsciiFlowerBackground() {
       canvas.style.width = `${width}px`;
       canvas.style.height = `${height}px`;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      cols = Math.ceil(width / CELL_W) + 1;
-      rows = Math.ceil(height / CELL_H) + 1;
-      ctx.font = `18px ${readVar("--font-mono", "monospace")}`;
+      slotCols = Math.ceil(width / SLOT_W) + 1;
+      slotRows = Math.ceil(height / SLOT_H) + 1;
+      ctx.font = `9px ${readVar("--font-mono", "monospace")}`;
       ctx.textBaseline = "middle";
       ctx.textAlign = "center";
     }
 
-    function colorFor(role: Role, col: number, row: number): string {
-      if (role === "bloom") {
-        const idx = Math.floor(hash(col * 3 + 1, row * 5 + 2) * seriesColors.length);
-        return seriesColors[idx] ?? stemColor;
+    function drawFlower(originX: number, originY: number, cellPx: number, sx: number, sy: number, nowMs: number) {
+      for (let r = 0; r < MASK_H; r++) {
+        for (let c = 0; c < MASK_W; c++) {
+          if (!FLOWER_MASK[r][c]) continue;
+          const px = originX + c * cellPx;
+          const py = originY + r * cellPx;
+
+          if (!BOUNDARY[r][c]) {
+            ctx.fillStyle = withAlpha(inkColor, 0.2);
+            ctx.fillRect(px, py, cellPx, cellPx);
+            continue;
+          }
+
+          const cellPhase = hash(sx * 31 + c * 7 + 3, sy * 37 + r * 11 + 5);
+          const period = GLITCH_PERIOD_MS * (0.7 + hash(sx * 13 + c, sy * 17 + r) * 0.8);
+          const t = ((nowMs + cellPhase * period) % period) / period;
+
+          if (t > GLITCH_FRACTION) {
+            ctx.fillStyle = withAlpha(inkColor, 0.14);
+            ctx.fillRect(px, py, cellPx, cellPx);
+            continue;
+          }
+
+          const accent = accentColors[Math.floor(hash(sx * 19 + c * 5, sy * 23 + r * 9) * accentColors.length)];
+          ctx.fillStyle = withAlpha(accent, 0.4);
+          ctx.fillRect(px, py, cellPx, cellPx);
+          ctx.strokeStyle = withAlpha(accent, 0.7);
+          ctx.lineWidth = 1;
+          ctx.strokeRect(px + 0.5, py + 0.5, cellPx - 1, cellPx - 1);
+
+          if (cellPx >= 6) {
+            const glyph = GLYPHS[Math.floor(hash(sx * 41 + c * 3, sy * 43 + r * 5) * GLYPHS.length)];
+            ctx.fillStyle = withAlpha(inkColor, 0.5);
+            ctx.fillText(glyph, px + cellPx / 2, py + cellPx / 2 + 0.5);
+          }
+        }
       }
-      if (role === "stem") return stemColor;
-      if (role === "wilt") return wiltColor;
-      return seedColor;
     }
 
     function drawFrame(nowMs: number) {
       ctx.clearRect(0, 0, width, height);
-      for (let row = 0; row < rows; row++) {
-        for (let col = 0; col < cols; col++) {
-          if (hash(col, row) > DENSITY) continue;
-
-          const phase = hash(col * 11 + 3, row * 17 + 7);
-          const cycle = CYCLE_BASE_MS + hash(col * 19 + 5, row * 23 + 9) * CYCLE_JITTER_MS;
-          const t = ((nowMs + phase * cycle) % cycle) / cycle;
-          const stage = STAGES[Math.min(Math.floor(t * STAGES.length), STAGES.length - 1)];
-          if (stage.ch === " ") continue;
-
-          const ch =
-            stage.ch === PEAK
-              ? BLOOM_GLYPHS[Math.floor(hash(col * 29 + 13, row * 31 + 17) * BLOOM_GLYPHS.length)]
-              : stage.ch;
-
-          ctx.fillStyle = withAlpha(colorFor(stage.role, col, row), alphaFor(stage.role));
-          ctx.fillText(ch, col * CELL_W + CELL_W / 2, row * CELL_H + CELL_H / 2);
+      for (let sy = 0; sy < slotRows; sy++) {
+        for (let sx = 0; sx < slotCols; sx++) {
+          if (hash(sx, sy) > SLOT_DENSITY) continue;
+          const jx = (hash(sx * 3 + 1, sy * 5 + 2) - 0.5) * SLOT_W * 0.5;
+          const jy = (hash(sx * 7 + 3, sy * 11 + 4) - 0.5) * SLOT_H * 0.5;
+          const cellPx = BASE_CELL_PX * (0.75 + hash(sx * 53 + 9, sy * 59 + 13) * 0.55);
+          const originX = sx * SLOT_W + jx;
+          const originY = sy * SLOT_H + jy;
+          drawFlower(originX, originY, cellPx, sx, sy, nowMs);
         }
       }
     }
